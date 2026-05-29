@@ -1,0 +1,63 @@
+# ===================================
+# Python
+# ===================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+sdist/
+wheels/
+*.whl
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===================================
+# Project-specific
+# ===================================
+# SQLite database files (auto-generated)
+*.db
+!data/*.sql
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Coverage / testing
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS generated files
+Desktop.ini
+$RECYCLE.BIN/
