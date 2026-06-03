@@ -18,11 +18,16 @@ from utils.db_manager import DBManager
 from utils.password_utils import hash_password
 
 
+def get_data_dir() -> str:
+    """获取数据资源目录（SQL脚本、JSON、图片、数据库等）"""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
+
 def init_database():
     """初始化数据库：建表 + 导入种子数据 + 创建测试账号"""
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    data_dir = get_data_dir()
 
-    # 1. 初始化数据库文件
+    # 1. 初始化数据库文件（存放在 data/ 目录下）
     db_path = os.path.join(data_dir, 'vegetable_db.db')
     DBManager.initialize(db_type='sqlite', db_path=db_path)
     print("[OK] 数据库连接已建立")

@@ -9,10 +9,8 @@ from PySide6.QtCore import Qt
 
 def get_image_dir() -> str:
     """获取图片存储目录"""
-    return os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        'data', 'images'
-    )
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_dir, 'data', 'images')
 
 
 def load_vegetable_image(vegetable, size: int = 200) -> QPixmap:

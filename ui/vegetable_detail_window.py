@@ -412,22 +412,22 @@ class VegetableDetailWindow(QDialog):
             name, ok = QInputDialog.getText(dlg, "新建清单", "清单名称：")
             if ok and name.strip():
                 desc, ok2 = QInputDialog.getText(dlg, "清单描述", "描述（可选）：")
-        description = desc.strip() if ok2 else ''
-        success, msg = self.user_service.create_custom_list(
-            name.strip(), description
-        )
-        if success:
-            lists.clear()
-            lists.extend(self.collection_service.get_user_custom_lists())
-            list_widget.clear()
-            for cl in lists:
-                text = cl.list_name
-                if cl.description:
-                    text += f"  ({cl.description})"
-                list_widget.addItem(text)
-            list_widget.setCurrentRow(list_widget.count() - 1)
-        else:
-            QMessageBox.warning(dlg, "失败", msg)
+                description = desc.strip() if ok2 else ''
+                success, msg = self.user_service.create_custom_list(
+                    name.strip(), description
+                )
+                if success:
+                    lists.clear()
+                    lists.extend(self.collection_service.get_user_custom_lists())
+                    list_widget.clear()
+                    for cl in lists:
+                        text = cl.list_name
+                        if cl.description:
+                            text += f"  ({cl.description})"
+                        list_widget.addItem(text)
+                    list_widget.setCurrentRow(list_widget.count() - 1)
+                else:
+                    QMessageBox.warning(dlg, "失败", msg)
         new_btn.clicked.connect(create_new)
 
         if dlg.exec() == QDialog.Accepted and lists and list_widget.currentRow() >= 0:
