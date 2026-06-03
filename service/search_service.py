@@ -72,6 +72,20 @@ class SearchService:
         """
         return self.vegetable_dao.get_hot_ranking(limit)
 
+    def get_value_ranking(self, limit: int = 10) -> List[Vegetable]:
+        """
+        获取最具性价比蔬菜排行榜
+        性价比公式：(收藏数 + 浏览数 × 0.5 + 1) / (参考价格)²
+        以价格为主导因素，人气作为辅助调节。
+
+        Args:
+            limit: 返回数量
+
+        Returns:
+            按性价比从高到低排序的蔬菜列表
+        """
+        return self.vegetable_dao.get_value_ranking(limit)
+
     def increment_view_count(self, veg_id: int) -> None:
         """
         增加蔬菜浏览量（BR-06：实时更新）

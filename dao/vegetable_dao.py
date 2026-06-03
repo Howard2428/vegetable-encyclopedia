@@ -112,6 +112,32 @@ class VegetableDAO(BaseDAO):
         rows = self.fetch_all(sql, (limit,))
         return [Vegetable.from_row(r) for r in rows]
 
+    def get_value_ranking(self, limit: int = 10) -> List[Vegetable]:
+        """
+        获取最具性价比蔬菜排行榜
+        性价比公式：(收藏数 + 浏览数 × 0.5 + 1) / (参考价格)²
+        以价格为主导因素（平方放大低价优势），人气作为辅助调节。
+        白菜、豆芽、土豆等低价高营养蔬菜自然排在前面。
+
+        Args:
+            limit: 返回数量
+
+        Returns:
+            按性价比从高到低排序的蔬菜列表
+        """
+        sql = """
+            SELECT * FROM veg_vegetable
+            ORDER BY
+                CASE WHEN price_ref > 0
+                     THEN (favorite_count + view_count * 0.5 + 1) / (price_ref * price_ref)
+                     ELSE 0
+                END DESC,
+                veg_name
+            LIMIT ?
+        """
+        rows = self.fetch_all(sql, (limit,))
+        return [Vegetable.from_row(r) for r in rows]
+
     def increment_view_count(self, veg_id: int) -> None:
         """增加蔬菜浏览量（BR-06：实时更新）"""
         sql = """

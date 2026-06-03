@@ -1,6 +1,7 @@
 """
 主窗口
-系统的主界面，包含搜索栏、时令蔬菜、分类导航、热门榜单和状态栏。
+系统的主界面，包含搜索栏、时令蔬菜、分类导航、热门榜单、
+最具性价比蔬菜排行榜和状态栏。
 """
 
 from ui.styles import GLOBAL_STYLE, PRIMARY_COLOR, CARD_BG
@@ -9,7 +10,7 @@ from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QListWidget, QTableWidget, QTableWidgetItem,
     QScrollArea, QFrame, QStatusBar, QMessageBox, QHeaderView,
-    QListWidgetItem
+    QListWidgetItem, QTabWidget
 )
 from datetime import datetime
 import sys
@@ -39,6 +40,7 @@ class MainWindow(QMainWindow):
         self._init_ui()
         self._load_seasonal_vegetables()
         self._load_hot_ranking()
+        self._load_value_ranking()
         self._update_user_status()
 
     def _init_ui(self):
@@ -187,13 +189,15 @@ class MainWindow(QMainWindow):
         self.result_table.doubleClicked.connect(self._on_table_double_click)
         right_layout.addWidget(self.result_table)
 
-        # 热门榜单
-        hot_label = QLabel("🔥 热门蔬菜榜单 Top10")
-        hot_label.setProperty("cssClass", "subtitle")
-        hot_label.setStyleSheet(
-            f"color: #FF6F00; font-size: 16px; font-weight: bold;"
-        )
-        right_layout.addWidget(hot_label)
+        # 排行榜标签页（热门榜单 + 性价比排行）
+        self.ranking_tabs = QTabWidget()
+        self.ranking_tabs.setMaximumHeight(380)
+
+        # --- 热门榜单Tab ---
+        hot_tab = QWidget()
+        hot_tab_layout = QVBoxLayout(hot_tab)
+        hot_tab_layout.setContentsMargins(0, 0, 0, 0)
+        hot_tab_layout.setSpacing(0)
 
         self.hot_table = QTableWidget()
         self.hot_table.setColumnCount(4)
@@ -205,9 +209,31 @@ class MainWindow(QMainWindow):
             0, QHeaderView.ResizeToContents)
         self.hot_table.setSelectionBehavior(QTableWidget.SelectRows)
         self.hot_table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.hot_table.setMaximumHeight(320)
         self.hot_table.doubleClicked.connect(self._on_hot_table_double_click)
-        right_layout.addWidget(self.hot_table)
+        hot_tab_layout.addWidget(self.hot_table)
+        self.ranking_tabs.addTab(hot_tab, "🔥 热门榜单")
+
+        # --- 性价比排行Tab ---
+        value_tab = QWidget()
+        value_tab_layout = QVBoxLayout(value_tab)
+        value_tab_layout.setContentsMargins(0, 0, 0, 0)
+        value_tab_layout.setSpacing(0)
+
+        self.value_table = QTableWidget()
+        self.value_table.setColumnCount(5)
+        self.value_table.setHorizontalHeaderLabels(
+            ["排名", "名称", "品类", "价格(元/斤)", "性价比分"]
+        )
+        self.value_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.value_table.horizontalHeader().setSectionResizeMode(
+            0, QHeaderView.ResizeToContents)
+        self.value_table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.value_table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.value_table.doubleClicked.connect(self._on_value_table_double_click)
+        value_tab_layout.addWidget(self.value_table)
+        self.ranking_tabs.addTab(value_tab, "💰 性价比排行")
+
+        right_layout.addWidget(self.ranking_tabs)
 
         mid_layout.addLayout(right_layout)
         main_layout.addLayout(mid_layout)
@@ -368,6 +394,34 @@ class MainWindow(QMainWindow):
             score = veg.view_count + veg.favorite_count
             self.hot_table.setItem(i, 3, QTableWidgetItem(str(score)))
 
+    def _load_value_ranking(self):
+        """加载最具性价比蔬菜排行榜"""
+        value_vegs = self.search_service.get_value_ranking(10)
+        self.value_table.setRowCount(len(value_vegs))
+        for i, veg in enumerate(value_vegs):
+            # 排名（前三名使用奖牌图标）
+            rank_item = QTableWidgetItem(str(i + 1))
+            if i == 0:
+                rank_item.setText("🥇 1")
+            elif i == 1:
+                rank_item.setText("🥈 2")
+            elif i == 2:
+                rank_item.setText("🥉 3")
+            self.value_table.setItem(i, 0, rank_item)
+            self.value_table.setItem(i, 1, QTableWidgetItem(veg.name))
+            self.value_table.setItem(i, 2, QTableWidgetItem(veg.category))
+            # 价格显示
+            price_text = f"¥{veg.price_ref:.2f}" if veg.price_ref else "-"
+            self.value_table.setItem(i, 3, QTableWidgetItem(price_text))
+            # 性价比分数（价格越低、人气越高的蔬菜得分越高）
+            if veg.price_ref and veg.price_ref > 0:
+                value_score = (veg.favorite_count + veg.view_count * 0.5 + 1) / (veg.price_ref ** 2)
+            else:
+                value_score = 0.0
+            self.value_table.setItem(i, 4, QTableWidgetItem(f"{value_score:.2f}"))
+        # 存储数据用于双击打开详情
+        self._displayed_value_vegetables = value_vegs
+
     def _display_vegetables(self, vegetables, title: str):
         """在结果表格中展示蔬菜列表"""
         self.result_label.setText(title)
@@ -400,6 +454,14 @@ class MainWindow(QMainWindow):
         if row < len(hot_vegs):
             self._open_detail(hot_vegs[row])
 
+    def _on_value_table_double_click(self, index):
+        """双击性价比排行榜行"""
+        row = index.row()
+        if hasattr(self, '_displayed_value_vegetables') and \
+           row < len(self._displayed_value_vegetables):
+            veg = self._displayed_value_vegetables[row]
+            self._open_detail(veg)
+
     def _open_detail(self, vegetable):
         """打开蔬菜详情窗口"""
         self.search_service.increment_view_count(vegetable.veg_id)
@@ -425,6 +487,7 @@ class MainWindow(QMainWindow):
 
         # 刷新数据
         self._load_hot_ranking()
+        self._load_value_ranking()
 
     def _open_user_center(self):
         """打开个人中心（含退出后重新登录流程）"""
@@ -461,6 +524,7 @@ class MainWindow(QMainWindow):
         """刷新主页面所有数据"""
         self._load_seasonal_vegetables()
         self._load_hot_ranking()
+        self._load_value_ranking()
         self._display_vegetables(
             self.search_service.get_all_vegetables(), "全部蔬菜")
         self._update_user_status()
