@@ -6,7 +6,10 @@
 
 import sqlite3
 import os
+import logging
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class DBManager:
@@ -75,6 +78,10 @@ class DBManager:
 
         Args:
             sql_file_path: SQL建表脚本文件路径，默认使用data/init_db.sql
+
+        Raises:
+            FileNotFoundError: 当SQL文件不存在时
+            RuntimeError: 当数据库未初始化或执行SQL失败时
         """
         if sql_file_path is None:
             sql_file_path = os.path.join(
@@ -92,15 +99,14 @@ class DBManager:
         statements = [s.strip() for s in sql_script.split(';') if s.strip()]
         for statement in statements:
             try:
-                if cls._db_type == 'sqlite':
-                    cursor.execute(statement)
-                else:
-                    cursor.execute(statement)
+                cursor.execute(statement)
             except Exception as e:
                 # 表已存在则跳过
                 if 'already exists' in str(e).lower() or \
                    'duplicate' in str(e).lower():
                     continue
+                logger.error("建表脚本执行失败 [%s]: %s",
+                             statement[:60], e)
                 raise
 
         conn.commit()

@@ -5,11 +5,14 @@
 
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List
 from dao.base_dao import BaseDAO
 from entity.association_rule import AssociationRule
+
+logger = logging.getLogger(__name__)
 
 
 class AssociationRuleDAO(BaseDAO):
@@ -27,7 +30,7 @@ class AssociationRuleDAO(BaseDAO):
 
     def batch_insert(self, rules: List[dict]) -> int:
         """
-        批量插入关联规则
+        批量插入关联规则（事务安全：全部成功或全部回滚）
 
         Args:
             rules: 规则字典列表，每个字典包含 ante_veg_id, post_veg_id,
@@ -35,26 +38,32 @@ class AssociationRuleDAO(BaseDAO):
 
         Returns:
             插入的记录数
+
+        Raises:
+            RuntimeError: 当批量插入失败时（已回滚）
         """
         sql = """
             INSERT INTO veg_association_rule
             (ante_veg_id, post_veg_id, support, confidence, lift, create_time)
             VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
         """
-        count = 0
         conn = self.get_connection()
         cursor = conn.cursor()
-        for rule in rules:
-            cursor.execute(sql, (
-                rule['ante_veg_id'],
-                rule['post_veg_id'],
-                rule['support'],
-                rule['confidence'],
-                rule['lift'],
-            ))
-            count += 1
-        conn.commit()
-        return count
+        try:
+            for rule in rules:
+                cursor.execute(sql, (
+                    rule['ante_veg_id'],
+                    rule['post_veg_id'],
+                    rule['support'],
+                    rule['confidence'],
+                    rule['lift'],
+                ))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            logger.error("关联规则批量插入失败，已回滚: %s", e)
+            raise RuntimeError(f"关联规则批量插入失败: {e}") from e
+        return len(rules)
 
     def get_by_ante_veg(self, veg_id: int, limit: int = 5) -> List[AssociationRule]:
         """

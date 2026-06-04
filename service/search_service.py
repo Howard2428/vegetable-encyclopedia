@@ -5,11 +5,14 @@
 
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List
 from entity.vegetable import Vegetable
 from dao.vegetable_dao import VegetableDAO
+
+logger = logging.getLogger(__name__)
 
 
 class SearchService:
@@ -93,7 +96,10 @@ class SearchService:
         Args:
             veg_id: 蔬菜ID
         """
-        self.vegetable_dao.increment_view_count(veg_id)
+        try:
+            self.vegetable_dao.increment_view_count(veg_id)
+        except RuntimeError as e:
+            logger.error("更新浏览量失败(veg_id=%d): %s", veg_id, e)
 
     def get_all_vegetables(self) -> List[Vegetable]:
         """获取所有蔬菜"""

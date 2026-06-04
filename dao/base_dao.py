@@ -5,10 +5,13 @@
 
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List, Optional, Any
 from utils.db_manager import DBManager
+
+logger = logging.getLogger(__name__)
 
 
 class BaseDAO:
@@ -31,11 +34,19 @@ class BaseDAO:
 
         Returns:
             受影响的行数或最后插入的ID
+
+        Raises:
+            RuntimeError: 当数据库操作失败时
         """
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute(sql, params)
-        conn.commit()
+        try:
+            cursor.execute(sql, params)
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            logger.error("数据库写操作失败 [SQL: %s]: %s", sql.strip()[:80], e)
+            raise RuntimeError(f"数据库写操作失败: {e}") from e
         # 如果是INSERT语句，返回最后插入的ID
         if sql.strip().upper().startswith('INSERT'):
             return cursor.lastrowid
@@ -51,11 +62,18 @@ class BaseDAO:
 
         Returns:
             查询结果列表
+
+        Raises:
+            RuntimeError: 当查询失败时
         """
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute(sql, params)
-        return cursor.fetchall()
+        try:
+            cursor.execute(sql, params)
+            return cursor.fetchall()
+        except Exception as e:
+            logger.error("数据库查询失败 [SQL: %s]: %s", sql.strip()[:80], e)
+            raise RuntimeError(f"数据库查询失败: {e}") from e
 
     def fetch_one(self, sql: str, params: tuple = ()) -> Optional[Any]:
         """
@@ -67,11 +85,18 @@ class BaseDAO:
 
         Returns:
             单条记录或None
+
+        Raises:
+            RuntimeError: 当查询失败时
         """
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute(sql, params)
-        return cursor.fetchone()
+        try:
+            cursor.execute(sql, params)
+            return cursor.fetchone()
+        except Exception as e:
+            logger.error("数据库查询失败 [SQL: %s]: %s", sql.strip()[:80], e)
+            raise RuntimeError(f"数据库查询失败: {e}") from e
 
     def fetch_all(self, sql: str, params: tuple = ()) -> list:
         """

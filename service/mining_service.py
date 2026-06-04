@@ -5,6 +5,7 @@
 
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List, Dict, Tuple
@@ -13,6 +14,8 @@ from mlxtend.frequent_patterns import apriori, association_rules
 from dao.recipe_dao import RecipeDAO
 from dao.vegetable_dao import VegetableDAO
 from dao.association_rule_dao import AssociationRuleDAO
+
+logger = logging.getLogger(__name__)
 
 
 class MiningService:
@@ -175,4 +178,5 @@ class MiningService:
             return count, f"关联规则挖掘完成！共生成{count}条有效规则"
 
         except Exception as e:
+            logger.error("关联规则挖掘失败: %s", e, exc_info=True)
             return 0, f"挖掘过程出错：{str(e)}"
