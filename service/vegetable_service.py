@@ -55,8 +55,8 @@ class VegetableService:
             vegetable.alias = vegetable.alias.strip() if vegetable.alias else ''
             self.vegetable_dao.insert(vegetable)
             return True, f"蔬菜「{vegetable.name}」添加成功"
-        except Exception as e:
-            return False, f"添加失败：{str(e)}"
+        except Exception:
+            return False, "添加失败，请稍后重试"
 
     def update_vegetable(self, vegetable: Vegetable) -> Tuple[bool, str]:
         """
@@ -80,8 +80,8 @@ class VegetableService:
         try:
             self.vegetable_dao.update(vegetable)
             return True, f"蔬菜「{vegetable.name}」更新成功"
-        except Exception as e:
-            return False, f"更新失败：{str(e)}"
+        except Exception:
+            return False, "更新失败，请稍后重试"
 
     def delete_vegetable(self, veg_id: int) -> Tuple[bool, str]:
         """
@@ -100,8 +100,8 @@ class VegetableService:
         try:
             self.vegetable_dao.delete(veg_id)
             return True, f"蔬菜「{veg.name}」已删除"
-        except Exception as e:
-            return False, f"删除失败：{str(e)}"
+        except Exception:
+            return False, "删除失败，请稍后重试"
 
     def get_all_vegetables(self) -> List[Vegetable]:
         """获取所有蔬菜"""
@@ -125,8 +125,8 @@ class VegetableService:
             method.ingredients = method.ingredients.strip() if method.ingredients else ''
             self.cooking_method_dao.insert(method)
             return True, "烹饪方法添加成功"
-        except Exception as e:
-            return False, f"添加失败：{str(e)}"
+        except Exception:
+            return False, "添加失败，请稍后重试"
 
     def update_cooking_method(self, method: CookingMethod) -> Tuple[bool, str]:
         """更新一条烹饪方法"""
@@ -140,16 +140,16 @@ class VegetableService:
             method.ingredients = method.ingredients.strip() if method.ingredients else ''
             self.cooking_method_dao.update(method)
             return True, "烹饪方法更新成功"
-        except Exception as e:
-            return False, f"更新失败：{str(e)}"
+        except Exception:
+            return False, "更新失败，请稍后重试"
 
     def delete_cooking_method(self, method_id: int) -> Tuple[bool, str]:
         """删除一条烹饪方法"""
         try:
             self.cooking_method_dao.delete(method_id)
             return True, "烹饪方法已删除"
-        except Exception as e:
-            return False, f"删除失败：{str(e)}"
+        except Exception:
+            return False, "删除失败，请稍后重试"
 
     def replace_cooking_methods(self, veg_id: int,
                                 methods: List[CookingMethod]) -> Tuple[bool, str]:

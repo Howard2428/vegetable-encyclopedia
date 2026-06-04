@@ -124,7 +124,7 @@ class LoginWindow(QDialog):
 
         layout.addStretch()
 
-        hint = QLabel("测试账号：test / Test1234\n管理员：admin / Admin1234")
+        hint = QLabel("请使用已注册的账号登录")
         hint.setStyleSheet("color: #999; font-size: 12px;")
         hint.setAlignment(Qt.AlignCenter)
         layout.addWidget(hint)

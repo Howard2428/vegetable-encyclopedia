@@ -39,6 +39,11 @@ class VegetableDAO(BaseDAO):
         rows = self.fetch_all(sql, (category,))
         return [Vegetable.from_row(r) for r in rows]
 
+    @staticmethod
+    def _escape_like(value: str) -> str:
+        """Escape SQL LIKE wildcard characters to prevent LIKE injection."""
+        return value.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+
     def get_by_season(self, season: str) -> List[Vegetable]:
         """
         按季节查询蔬菜
@@ -51,12 +56,12 @@ class VegetableDAO(BaseDAO):
         """
         sql = """
             SELECT * FROM veg_vegetable
-            WHERE season LIKE ? OR season = '全年'
+            WHERE season LIKE ? ESCAPE '\\' OR season = '全年'
             ORDER BY
                 CASE WHEN season = ? THEN 0 ELSE 1 END,
                 veg_name
         """
-        season_pattern = f'%{season}%'
+        season_pattern = f'%{self._escape_like(season)}%'
         rows = self.fetch_all(sql, (season_pattern, season))
         return [Vegetable.from_row(r) for r in rows]
 
@@ -73,19 +78,20 @@ class VegetableDAO(BaseDAO):
         """
         sql = """
             SELECT * FROM veg_vegetable
-            WHERE LOWER(veg_name) LIKE LOWER(?)
-               OR LOWER(alias) LIKE LOWER(?)
+            WHERE LOWER(veg_name) LIKE LOWER(?) ESCAPE '\\'
+               OR LOWER(alias) LIKE LOWER(?) ESCAPE '\\'
             ORDER BY
                 CASE
                     WHEN LOWER(veg_name) = LOWER(?) THEN 0
-                    WHEN LOWER(veg_name) LIKE LOWER(?) THEN 1
-                    WHEN LOWER(veg_name) LIKE LOWER(?) THEN 2
+                    WHEN LOWER(veg_name) LIKE LOWER(?) ESCAPE '\\' THEN 1
+                    WHEN LOWER(veg_name) LIKE LOWER(?) ESCAPE '\\' THEN 2
                     ELSE 3
                 END,
                 veg_name
         """
-        pattern = f'%{keyword}%'
-        prefix_pattern = f'{keyword}%'
+        escaped = self._escape_like(keyword)
+        pattern = f'%{escaped}%'
+        prefix_pattern = f'{escaped}%'
         rows = self.fetch_all(sql, (
             pattern, pattern,           # WHERE: 名称或别名包含
             keyword,                     # ORDER 0: 名称精确匹配

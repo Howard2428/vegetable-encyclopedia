@@ -588,8 +588,8 @@ class AdminWindow(QDialog):
                     self, "导入成功",
                     f"成功导入 {count} 条菜谱数据！"
                 )
-            except Exception as e:
-                QMessageBox.warning(self, "导入失败", str(e))
+            except Exception:
+                QMessageBox.warning(self, "导入失败", "导入菜谱数据失败，请检查文件格式")
 
     def _create_mining_page(self) -> QWidget:
         page = QWidget()
@@ -704,7 +704,7 @@ class AdminWindow(QDialog):
         layout.addWidget(self.users_table)
 
         btn_layout = QHBoxLayout()
-        reset_btn = QPushButton("🔑 重置选中用户密码为 12345678")
+        reset_btn = QPushButton("🔑 重置选中用户密码（随机生成）")
         reset_btn.setStyleSheet(
             "QPushButton { background-color: #FF6F00; color: white; border: none; "
             "border-radius: 6px; padding: 8px 16px; font-size: 14px; font-weight: bold; "
@@ -734,8 +734,22 @@ class AdminWindow(QDialog):
             self.users_table.setItem(i, 5, QTableWidgetItem(
                 str(u['last_login_time']) if u['last_login_time'] else '从未登录'))
 
+    @staticmethod
+    def _generate_random_password(length: int = 12) -> str:
+        """Generate a random password with uppercase, lowercase, digits, and symbols."""
+        import secrets
+        import string
+        alphabet = string.ascii_letters + string.digits + '!@#$%&*'
+        while True:
+            pwd = ''.join(secrets.choice(alphabet) for _ in range(length))
+            if (any(c.islower() for c in pwd)
+                    and any(c.isupper() for c in pwd)
+                    and any(c.isdigit() for c in pwd)
+                    and any(c in '!@#$%&*' for c in pwd)):
+                return pwd
+
     def _reset_user_password(self):
-        """重置选中用户的密码为12345678"""
+        """重置选中用户的密码为随机强密码"""
         if not self.user_dao:
             return
         row = self.users_table.currentRow()
@@ -746,14 +760,16 @@ class AdminWindow(QDialog):
         username = self.users_table.item(row, 1).text()
         reply = QMessageBox.question(
             self, "确认重置",
-            f"确定要将用户「{username}」的密码重置为 12345678 吗？",
+            f"确定要重置用户「{username}」的密码吗？\n将生成一个随机强密码。",
             QMessageBox.Yes | QMessageBox.No
         )
         if reply == QMessageBox.Yes:
             from utils.password_utils import hash_password
-            self.user_dao.update_password(user_id, hash_password("12345678"))
+            new_pwd = self._generate_random_password()
+            self.user_dao.update_password(user_id, hash_password(new_pwd))
             QMessageBox.information(
-                self, "成功", f"用户「{username}」密码已重置为 12345678")
+                self, "成功",
+                f"用户「{username}」密码已重置为：\n\n{new_pwd}\n\n请妥善保管并尽快修改。")
 
     def _create_reset_page(self) -> QWidget:
         page = QWidget()
