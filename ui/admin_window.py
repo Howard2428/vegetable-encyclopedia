@@ -471,7 +471,7 @@ class AdminWindow(QDialog):
         )
         del_cooking_btn.clicked.connect(lambda: (
             cooking_methods.pop(cooking_list.currentRow())
-            or _refresh_cooking_list()
+            and _refresh_cooking_list()
             if cooking_list.currentRow() >= 0 else None
         ))
         cooking_btn_layout.addWidget(del_cooking_btn)
