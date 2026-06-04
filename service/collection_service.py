@@ -58,8 +58,8 @@ class CollectionService:
             if result == 0:
                 return False, "该蔬菜已在收藏夹中"
             return True, "已收藏"
-        except Exception as e:
-            return False, f"收藏失败：{str(e)}"
+        except Exception:
+            return False, "收藏失败，请稍后重试"
 
     def remove_from_favorites(self, fav_list_id: int,
                               veg_id: int) -> Tuple[bool, str]:
@@ -80,8 +80,8 @@ class CollectionService:
         try:
             self.favorites_dao.remove_item(fav_list_id, veg_id)
             return True, "已取消收藏"
-        except Exception as e:
-            return False, f"取消收藏失败：{str(e)}"
+        except Exception:
+            return False, "取消收藏失败，请稍后重试"
 
     def get_user_favorites_lists(self) -> List[FavoritesList]:
         """获取当前用户的所有收藏夹"""
@@ -101,8 +101,8 @@ class CollectionService:
         try:
             self.favorites_dao.delete_list(fav_list_id)
             return True, "收藏夹已删除"
-        except Exception as e:
-            return False, f"删除失败：{str(e)}"
+        except Exception:
+            return False, "删除失败，请稍后重试"
 
     def get_favorited_veg_ids(self) -> List[int]:
         """获取当前用户所有收藏的蔬菜ID"""
@@ -137,8 +137,8 @@ class CollectionService:
             if result == 0:
                 return False, "该蔬菜已在清单中"
             return True, "已加入清单"
-        except Exception as e:
-            return False, f"加入清单失败：{str(e)}"
+        except Exception:
+            return False, "加入清单失败，请稍后重试"
 
     def remove_from_custom_list(self, list_id: int,
                                 veg_id: int) -> Tuple[bool, str]:
@@ -159,8 +159,8 @@ class CollectionService:
         try:
             self.custom_list_dao.remove_item(list_id, veg_id)
             return True, "已从清单移除"
-        except Exception as e:
-            return False, f"移除失败：{str(e)}"
+        except Exception:
+            return False, "移除失败，请稍后重试"
 
     def get_user_custom_lists(self) -> List[CustomList]:
         """获取当前用户的所有自定义清单"""
