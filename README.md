@@ -22,7 +22,8 @@ code/
 │   ├── favorites_list.py      # 收藏夹实体
 │   ├── custom_list.py         # 自定义清单实体
 │   ├── association_rule.py    # 关联规则实体
-│   └── recipe.py              # 菜谱实体
+│   ├── recipe.py              # 菜谱实体
+│   └── cooking_method.py      # 烹饪方法实体
 ├── dao/                       # 数据访问层
 │   ├── base_dao.py            # 基础DAO
 │   ├── vegetable_dao.py       # 蔬菜CRUD+搜索+排行
@@ -31,7 +32,8 @@ code/
 │   ├── custom_list_dao.py     # 自定义清单操作
 │   ├── association_rule_dao.py# 关联规则读写
 │   ├── recipe_dao.py          # 菜谱数据存取
-│   └── browse_history_dao.py  # 浏览历史
+│   ├── browse_history_dao.py  # 浏览历史
+│   └── cooking_method_dao.py  # 烹饪方法CRUD
 ├── service/                   # 业务逻辑层
 │   ├── user_service.py        # 用户认证+管理
 │   ├── search_service.py      # 搜索+筛选+排行
@@ -53,7 +55,7 @@ code/
 │   ├── password_utils.py      # bcrypt密码加密
 │   └── image_utils.py         # 图片加载
 ├── data/                      # 数据文件
-│   ├── init_db.sql            # 建表脚本（8张表）
+│   ├── init_db.sql            # 建表脚本（9张表）
 │   ├── seed_vegetables.sql    # 58种蔬菜初始数据
 │   ├── recipes.json           # 118条菜谱数据
 │   └── images/                # 蔬菜图片
@@ -90,7 +92,7 @@ python main.py
 | 功能 | 状态 |
 |------|------|
 | 蔬菜分类浏览（6大品类） | ✅ |
-| 蔬菜详情（营养、选购、储存、价格） | ✅ |
+| 蔬菜详情（营养、选购、储存、烹饪推荐、价格） | ✅ |
 | 模糊搜索（名称+别名，不区分大小写） | ✅ |
 | 热门榜单Top10（浏览+收藏排序） | ✅ |
 | 用户注册/登录（bcrypt加密） | ✅ |
