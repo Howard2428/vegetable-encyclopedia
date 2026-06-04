@@ -493,8 +493,9 @@ class VegetableDetailWindow(QDialog):
             self.cooking_tab.setText("暂无推荐的烹饪方法")
             return
 
+        # 最多展示2条
         lines = []
-        for m in methods:
+        for m in methods[:2]:
             parts = [f"🍽 {m.method_name}"]
             if m.cooking_time:
                 parts.append(f"⏱{m.cooking_time}")
