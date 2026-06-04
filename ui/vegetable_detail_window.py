@@ -289,12 +289,19 @@ class VegetableDetailWindow(QDialog):
                 )
             self.recommendation_service.decrement_favorite_count(veg_id)
             QMessageBox.information(self, "提示", "已取消收藏")
-        else:
-            # 未收藏 → 自动创建默认收藏夹（如果还没有的话）
-            lists = self.collection_service.get_user_favorites_lists()
-            if not lists:
-                self.user_service.create_favorites_list("默认收藏夹")
+            self._update_favorite_btn()
+            self.vegetable = self.search_service.get_by_id(veg_id)
+            self.stats_label.setText(
+                f"👁 浏览 {self.vegetable.view_count} 次  |  "
+                f"❤ 收藏 {self.vegetable.favorite_count} 次"
+            )
+            return
+
+        # 未收藏 → 自动创建默认收藏夹（如果还没有的话）
         lists = self.collection_service.get_user_favorites_lists()
+        if not lists:
+            self.user_service.create_favorites_list("默认收藏夹")
+            lists = self.collection_service.get_user_favorites_lists()
 
         # 弹出选择收藏夹对话框
         dlg = QDialog(self)
@@ -326,13 +333,14 @@ class VegetableDetailWindow(QDialog):
 
         def create_new():
             name, ok = QInputDialog.getText(dlg, "新建收藏夹", "收藏夹名称：")
-            if ok and name.strip():
-                success, msg = self.user_service.create_favorites_list(
-                    name.strip())
-                if success:
-                    lists.clear()
-                    lists.extend(
-                        self.collection_service.get_user_favorites_lists())
+            if not ok or not name.strip():
+                return
+            success, msg = self.user_service.create_favorites_list(
+                name.strip())
+            if success:
+                lists.clear()
+                lists.extend(
+                    self.collection_service.get_user_favorites_lists())
                 list_widget.clear()
                 for fl in lists:
                     list_widget.addItem(fl.list_name)
@@ -341,7 +349,7 @@ class VegetableDetailWindow(QDialog):
                 QMessageBox.warning(dlg, "失败", msg)
         new_btn.clicked.connect(create_new)
 
-        if dlg.exec() == QDialog.Accepted and list_widget.currentRow() >= 0:
+        if dlg.exec() == QDialog.Accepted and lists and list_widget.currentRow() >= 0:
             fl = lists[list_widget.currentRow()]
             success, msg = self.collection_service.add_to_favorites(
                 fl.fav_list_id, veg_id
@@ -356,10 +364,11 @@ class VegetableDetailWindow(QDialog):
 
         self._update_favorite_btn()
         self.vegetable = self.search_service.get_by_id(veg_id)
-        self.stats_label.setText(
-            f"👁 浏览 {self.vegetable.view_count} 次  |  "
-            f"❤ 收藏 {self.vegetable.favorite_count} 次"
-        )
+        if self.vegetable:
+            self.stats_label.setText(
+                f"👁 浏览 {self.vegetable.view_count} 次  |  "
+                f"❤ 收藏 {self.vegetable.favorite_count} 次"
+            )
 
     def _on_add_to_list(self):
         """加入自定义清单（可当场新建）"""
