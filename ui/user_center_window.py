@@ -14,29 +14,9 @@ from PySide6.QtWidgets import (
     QMessageBox, QListWidgetItem, QFrame, QLineEdit
 )
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction, QIcon, QPixmap, QPainter, QColor, QPen, QBrush
-from ui.styles import GLOBAL_STYLE, CARD_BG
-
-
-def _make_eye_icon(visible: bool) -> QIcon:
-    px = QPixmap(32, 32)
-    px.fill(Qt.transparent)
-    p = QPainter(px)
-    p.setRenderHint(QPainter.Antialiasing)
-    if visible:
-        p.setPen(QPen(QColor("#666"), 2))
-        p.setBrush(QBrush(Qt.white))
-        p.drawEllipse(6, 10, 20, 13)
-        p.setBrush(QBrush(QColor("#666")))
-        p.drawEllipse(14, 13, 6, 7)
-    else:
-        p.setPen(QPen(QColor("#666"), 2))
-        p.setBrush(Qt.NoBrush)
-        p.drawEllipse(6, 10, 20, 13)
-        p.setPen(QPen(QColor("#D32F2F"), 2.5))
-        p.drawLine(3, 3, 29, 29)
-    p.end()
-    return QIcon(px)
+from PySide6.QtGui import QAction
+from ui.styles import GLOBAL_STYLE, CARD_BG, SECONDARY_BTN_STYLE, nav_btn_style
+from utils.ui_helpers import make_eye_icon, toggle_password_visibility
 
 
 class UserCenterWindow(QDialog):
@@ -89,17 +69,17 @@ class UserCenterWindow(QDialog):
         nav_layout.addWidget(nav_title)
 
         self.nav_favorites = QPushButton("⭐ 我的收藏夹")
-        self.nav_favorites.setStyleSheet(self._nav_btn_style(True))
+        self.nav_favorites.setStyleSheet(nav_btn_style(True))
         self.nav_favorites.clicked.connect(lambda: self._switch_page(0))
         nav_layout.addWidget(self.nav_favorites)
 
         self.nav_custom = QPushButton("📋 我的自定义清单")
-        self.nav_custom.setStyleSheet(self._nav_btn_style(False))
+        self.nav_custom.setStyleSheet(nav_btn_style(False))
         self.nav_custom.clicked.connect(lambda: self._switch_page(1))
         nav_layout.addWidget(self.nav_custom)
 
         self.nav_history = QPushButton("🕐 浏览历史")
-        self.nav_history.setStyleSheet(self._nav_btn_style(False))
+        self.nav_history.setStyleSheet(nav_btn_style(False))
         self.nav_history.clicked.connect(lambda: self._switch_page(2))
         nav_layout.addWidget(self.nav_history)
 
@@ -133,12 +113,7 @@ class UserCenterWindow(QDialog):
         bottom_layout.addWidget(logout_btn)
 
         close_btn = QPushButton("返回主窗口")
-        close_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 16px; "
-            "font-size: 13px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        close_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         close_btn.clicked.connect(self.accept)
         bottom_layout.addWidget(close_btn)
 
@@ -164,26 +139,12 @@ class UserCenterWindow(QDialog):
         main_layout.addWidget(self.content_stack)
         self.setLayout(main_layout)
 
-    def _nav_btn_style(self, active: bool) -> str:
-        """导航按钮样式"""
-        if active:
-            return (
-                "text-align: left; padding: 12px 18px; border: none; "
-                "border-radius: 0; background-color: #E8F5E9; "
-                "color: #2E7D32; font-weight: bold; font-size: 14px;"
-            )
-        return (
-            "text-align: left; padding: 12px 18px; border: none; "
-            "border-radius: 0; background-color: transparent; "
-            "color: #333; font-size: 14px;"
-        )
-
     def _switch_page(self, index: int):
         """切换页面"""
         self.content_stack.setCurrentIndex(index)
-        self.nav_favorites.setStyleSheet(self._nav_btn_style(index == 0))
-        self.nav_custom.setStyleSheet(self._nav_btn_style(index == 1))
-        self.nav_history.setStyleSheet(self._nav_btn_style(index == 2))
+        self.nav_favorites.setStyleSheet(nav_btn_style(index == 0))
+        self.nav_custom.setStyleSheet(nav_btn_style(index == 1))
+        self.nav_history.setStyleSheet(nav_btn_style(index == 2))
         if index == 2:
             self._load_history()
 
@@ -390,12 +351,7 @@ class UserCenterWindow(QDialog):
         ok_btn.clicked.connect(dlg.accept)
         btn_layout.addWidget(ok_btn)
         cancel_btn = QPushButton("取消")
-        cancel_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 16px; "
-            "font-size: 14px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        cancel_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         cancel_btn.clicked.connect(dlg.reject)
         btn_layout.addWidget(cancel_btn)
         layout.addLayout(btn_layout)
@@ -494,24 +450,16 @@ class UserCenterWindow(QDialog):
         pwd_input = QLineEdit()
         pwd_input.setPlaceholderText(placeholder)
         pwd_input.setEchoMode(QLineEdit.Password)
-        eye_visible = _make_eye_icon(True)
-        eye_hidden = _make_eye_icon(False)
+        eye_visible = make_eye_icon(True)
+        eye_hidden = make_eye_icon(False)
         action = QAction(eye_visible, "", pwd_input)
         action.triggered.connect(
-            lambda: self._toggle_pwd(pwd_input, action, eye_visible, eye_hidden)
+            lambda: toggle_password_visibility(
+                pwd_input, action, eye_visible, eye_hidden
+            )
         )
         pwd_input.addAction(action, QLineEdit.TrailingPosition)
         return pwd_input
-
-    @staticmethod
-    def _toggle_pwd(input_field, action, icon_visible, icon_hidden):
-        """切换密码显示/隐藏"""
-        if input_field.echoMode() == QLineEdit.Password:
-            input_field.setEchoMode(QLineEdit.Normal)
-            action.setIcon(icon_hidden)
-        else:
-            input_field.setEchoMode(QLineEdit.Password)
-            action.setIcon(icon_visible)
 
     def _on_logout(self):
         """退出登录"""

@@ -213,8 +213,6 @@ class VegetableDAO(BaseDAO):
         """
         return self.execute_update(sql)
 
-    def count(self) -> int:
+    def count(self, table='veg_vegetable', where='', params=()):
         """统计蔬菜总数"""
-        sql = "SELECT COUNT(*) as cnt FROM veg_vegetable"
-        row = self.fetch_one(sql)
-        return row['cnt'] if row else 0
+        return super().count(table, where, params)

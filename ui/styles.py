@@ -282,3 +282,40 @@ QSpinBox:focus, QDoubleSpinBox:focus {{
     border-color: {PRIMARY_COLOR};
 }}
 """
+
+# ====== 可复用内联样式（用于 setStyleSheet，不经过 QSS property 选择器） ======
+
+SECONDARY_BTN_STYLE = (
+    "QPushButton { background-color: white; color: #2E7D32; "
+    "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 14px; "
+    "font-size: 14px; font-weight: bold; min-height: 30px; } "
+    "QPushButton:hover { background-color: #E8F5E9; }"
+)
+
+LINK_BTN_STYLE = (
+    "QPushButton { background-color: transparent; color: #757575; "
+    "border: none; font-size: 13px; text-decoration: underline; } "
+    "QPushButton:hover { color: #424242; }"
+)
+
+
+def nav_btn_style(active: bool, active_bg: str = "#E8F5E9",
+                  active_color: str = "#2E7D32") -> str:
+    """生成侧边导航按钮样式
+
+    Args:
+        active: 是否为当前激活项
+        active_bg: 激活态背景色
+        active_color: 激活态文字色
+    """
+    if active:
+        return (
+            "text-align: left; padding: 12px 18px; border: none; "
+            f"border-radius: 0; background-color: {active_bg}; "
+            f"color: {active_color}; font-weight: bold; font-size: 14px;"
+        )
+    return (
+        "text-align: left; padding: 12px 18px; border: none; "
+        "border-radius: 0; background-color: transparent; "
+        "color: #333; font-size: 14px;"
+    )

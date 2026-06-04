@@ -88,9 +88,7 @@ class RecipeDAO(BaseDAO):
 
     def get_recipe_count(self) -> int:
         """获取菜谱总数"""
-        sql = "SELECT COUNT(*) as cnt FROM veg_recipe"
-        row = self.fetch_one(sql)
-        return row['cnt'] if row else 0
+        return self.count('veg_recipe')
 
     def clear_all(self) -> int:
         """清空所有菜谱数据"""

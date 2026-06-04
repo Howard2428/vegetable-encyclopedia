@@ -62,9 +62,7 @@ class UserDAO(BaseDAO):
 
     def check_username_exists(self, username: str) -> bool:
         """检查用户名是否存在"""
-        sql = "SELECT COUNT(*) as cnt FROM sys_user WHERE username = ?"
-        row = self.fetch_one(sql, (username,))
-        return row['cnt'] > 0 if row else False
+        return self.count('sys_user', 'username = ?', (username,)) > 0
 
     def update_password(self, user_id: int, new_password_hash: str) -> None:
         """更新用户密码"""
@@ -85,15 +83,11 @@ class UserDAO(BaseDAO):
 
     def get_user_count(self) -> int:
         """统计用户总数"""
-        sql = "SELECT COUNT(*) as cnt FROM sys_user"
-        row = self.fetch_one(sql)
-        return row['cnt'] if row else 0
+        return self.count('sys_user')
 
     def delete_all_users(self) -> int:
         """删除所有用户及关联数据（收藏夹、清单、浏览历史），返回删除用户数"""
-        count_sql = "SELECT COUNT(*) as cnt FROM sys_user"
-        row = self.fetch_one(count_sql)
-        user_count = row['cnt'] if row else 0
+        user_count = self.count('sys_user')
 
         # 按外键依赖顺序删除
         self.execute_update("DELETE FROM veg_browse_history")
@@ -109,6 +103,4 @@ class UserDAO(BaseDAO):
         """检查邮箱是否已被使用"""
         if not email:
             return False
-        sql = "SELECT COUNT(*) as cnt FROM sys_user WHERE email = ?"
-        row = self.fetch_one(sql, (email,))
-        return row['cnt'] > 0 if row else False
+        return self.count('sys_user', 'email = ?', (email,)) > 0

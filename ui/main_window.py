@@ -4,7 +4,7 @@
 最具性价比蔬菜排行榜和状态栏。
 """
 
-from ui.styles import GLOBAL_STYLE, PRIMARY_COLOR, CARD_BG
+from ui.styles import GLOBAL_STYLE, PRIMARY_COLOR, CARD_BG, SECONDARY_BTN_STYLE
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
@@ -88,12 +88,7 @@ class MainWindow(QMainWindow):
         self.refresh_btn = QPushButton("🔄")
         self.refresh_btn.setFixedWidth(40)
         self.refresh_btn.setToolTip("刷新数据")
-        self.refresh_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; "
-            "font-size: 16px; font-weight: bold; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        self.refresh_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         self.refresh_btn.clicked.connect(self._refresh_all)
         top_bar.addWidget(self.refresh_btn)
 

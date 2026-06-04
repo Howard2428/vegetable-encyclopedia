@@ -2,8 +2,8 @@
 登录窗口（模态对话框）
 """
 
-from ui.styles import GLOBAL_STYLE
-from PySide6.QtGui import QAction, QIcon, QPixmap, QPainter, QColor, QPen, QBrush
+from ui.styles import GLOBAL_STYLE, SECONDARY_BTN_STYLE, LINK_BTN_STYLE
+from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
@@ -11,30 +11,10 @@ from PySide6.QtWidgets import (
 )
 import sys
 import os
-import re
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-def _make_eye_icon(visible: bool) -> QIcon:
-    """画一个眼睛图标（visible=True睁眼 / False闭眼）"""
-    px = QPixmap(32, 32)
-    px.fill(Qt.transparent)
-    p = QPainter(px)
-    p.setRenderHint(QPainter.Antialiasing)
-    if visible:
-        p.setPen(QPen(QColor("#666"), 2))
-        p.setBrush(QBrush(Qt.white))
-        p.drawEllipse(6, 10, 20, 13)
-        p.setBrush(QBrush(QColor("#666")))
-        p.drawEllipse(14, 13, 6, 7)
-    else:
-        p.setPen(QPen(QColor("#666"), 2))
-        p.setBrush(Qt.NoBrush)
-        p.drawEllipse(6, 10, 20, 13)
-        p.setPen(QPen(QColor("#D32F2F"), 2.5))
-        p.drawLine(3, 3, 29, 29)
-    p.end()
-    return QIcon(px)
+from utils.ui_helpers import make_eye_icon, toggle_password_visibility
+from utils.password_utils import is_weak_password
 
 
 class LoginWindow(QDialog):
@@ -81,8 +61,8 @@ class LoginWindow(QDialog):
         self.password_input.setPlaceholderText("请输入密码")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.returnPressed.connect(self._on_login)
-        self._pwd_icon_visible = _make_eye_icon(True)
-        self._pwd_icon_hidden = _make_eye_icon(False)
+        self._pwd_icon_visible = make_eye_icon(True)
+        self._pwd_icon_hidden = make_eye_icon(False)
         self._pwd_action = QAction(
             self._pwd_icon_visible, "", self.password_input)
         self._pwd_action.triggered.connect(self._toggle_password)
@@ -101,12 +81,7 @@ class LoginWindow(QDialog):
         btn_layout.addWidget(self.login_btn)
 
         self.register_btn = QPushButton("注 册")
-        self.register_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 14px; "
-            "font-size: 14px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        self.register_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         self.register_btn.clicked.connect(self._on_register)
         btn_layout.addWidget(self.register_btn)
 
@@ -114,11 +89,7 @@ class LoginWindow(QDialog):
 
         # 跳过登录（访客浏览）
         skip_btn = QPushButton("跳过，以访客身份浏览")
-        skip_btn.setStyleSheet(
-            "QPushButton { background-color: transparent; color: #757575; "
-            "border: none; font-size: 13px; text-decoration: underline; } "
-            "QPushButton:hover { color: #424242; }"
-        )
+        skip_btn.setStyleSheet(LINK_BTN_STYLE)
         skip_btn.clicked.connect(self._on_skip)
         layout.addWidget(skip_btn)
 
@@ -143,7 +114,7 @@ class LoginWindow(QDialog):
         success, msg = self.user_service.login(username, password)
         if success:
             self.login_success = True
-            if self._is_weak_password(password):
+            if is_weak_password(password):
                 reply = QMessageBox.question(
                     self, "安全提醒",
                     "当前密码安全等级过低，建议修改密码以确保账户安全。\n是否现在修改密码？",
@@ -154,20 +125,6 @@ class LoginWindow(QDialog):
             self.accept()
         else:
             QMessageBox.warning(self, "登录失败", msg)
-
-    @staticmethod
-    def _is_weak_password(password: str) -> bool:
-        """检查密码是否弱（长度<8 或 缺少复杂度）"""
-        if len(password) < 8:
-            return True
-        score = 0
-        if re.search(r'[a-z]', password) and re.search(r'[A-Z]', password):
-            score += 1
-        if re.search(r'\d', password):
-            score += 1
-        if re.search(r'[!@#$%^&*(),.?\":{}|<>_\-]', password):
-            score += 1
-        return score < 2
 
     def _show_change_password_dialog(self):
         """弹出修改密码对话框"""
@@ -202,12 +159,7 @@ class LoginWindow(QDialog):
         ok_btn.clicked.connect(dlg.accept)
         btn_layout.addWidget(ok_btn)
         skip_btn = QPushButton("暂不修改")
-        skip_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 14px; "
-            "font-size: 14px; font-weight: bold; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        skip_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         skip_btn.clicked.connect(dlg.reject)
         btn_layout.addWidget(skip_btn)
         layout.addLayout(btn_layout)
@@ -225,7 +177,7 @@ class LoginWindow(QDialog):
                 new_input.clear()
                 cfm_input.clear()
                 continue
-            if self._is_weak_password(new_pwd):
+            if is_weak_password(new_pwd):
                 QMessageBox.warning(dlg, "密码强度不足",
                                     "密码需至少8位，且包含大小写字母+数字")
                 continue
@@ -241,12 +193,10 @@ class LoginWindow(QDialog):
 
     def _toggle_password(self):
         """切换密码显示/隐藏"""
-        if self.password_input.echoMode() == QLineEdit.Password:
-            self.password_input.setEchoMode(QLineEdit.Normal)
-            self._pwd_action.setIcon(self._pwd_icon_hidden)
-        else:
-            self.password_input.setEchoMode(QLineEdit.Password)
-            self._pwd_action.setIcon(self._pwd_icon_visible)
+        toggle_password_visibility(
+            self.password_input, self._pwd_action,
+            self._pwd_icon_visible, self._pwd_icon_hidden
+        )
 
     def _on_skip(self):
         """访客浏览"""
