@@ -86,7 +86,18 @@ CREATE TABLE IF NOT EXISTS veg_association_rule (
     FOREIGN KEY (post_veg_id) REFERENCES veg_vegetable(veg_id)
 );
 
--- 表8：浏览历史表
+-- 表8：烹饪方法表
+CREATE TABLE IF NOT EXISTS veg_cooking_method (
+    method_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    veg_id       INTEGER      NOT NULL,
+    method_name  VARCHAR(50)  NOT NULL,
+    cooking_time VARCHAR(50),
+    ingredients  VARCHAR(200),
+    create_time  DATETIME     NOT NULL DEFAULT (datetime('now', 'localtime')),
+    FOREIGN KEY (veg_id) REFERENCES veg_vegetable(veg_id) ON DELETE CASCADE
+);
+
+-- 表9：浏览历史表
 CREATE TABLE IF NOT EXISTS veg_browse_history (
     history_id  INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id     INTEGER  NOT NULL,

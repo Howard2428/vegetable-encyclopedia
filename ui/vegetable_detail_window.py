@@ -21,7 +21,7 @@ class VegetableDetailWindow(QDialog):
 
     def __init__(self, vegetable, search_service, recommendation_service,
                  collection_service, user_service, browse_history_dao=None,
-                 parent=None):
+                 vegetable_service=None, parent=None):
         super().__init__(parent)
         self.vegetable = vegetable
         self.search_service = search_service
@@ -29,6 +29,7 @@ class VegetableDetailWindow(QDialog):
         self.collection_service = collection_service
         self.user_service = user_service
         self.browse_history_dao = browse_history_dao
+        self.vegetable_service = vegetable_service
         self._history = []
         self._init_ui()
         self._load_data()
@@ -167,6 +168,12 @@ class VegetableDetailWindow(QDialog):
             "padding: 15px; font-size: 14px; line-height: 1.6;")
         self.tab_widget.addTab(self.storage_tab, "📦 储存方法")
 
+        self.cooking_tab = QLabel()
+        self.cooking_tab.setAlignment(Qt.AlignTop)
+        self.cooking_tab.setStyleSheet(
+            "padding: 15px; font-size: 13px; line-height: 1.4;")
+        self.tab_widget.addTab(self.cooking_tab, "🍳 烹饪推荐")
+
         main_layout.addWidget(self.tab_widget)
 
         # === 底部：关联推荐 ===
@@ -248,6 +255,9 @@ class VegetableDetailWindow(QDialog):
 
         # 加载关联推荐
         self._load_recommendations()
+
+        # 加载烹饪方法推荐
+        self._load_cooking_methods()
 
     def _update_favorite_btn(self):
         """更新收藏按钮状态"""
@@ -470,6 +480,29 @@ class VegetableDetailWindow(QDialog):
         self.rec_widget.setMinimumWidth(
             len(rec_vegs) * (170 + 12) + 20
         )
+
+    def _load_cooking_methods(self):
+        """加载烹饪推荐方法（纯文字展示）"""
+        methods = []
+        if self.vegetable_service:
+            methods = self.vegetable_service.get_cooking_methods(
+                self.vegetable.veg_id
+            )
+
+        if not methods:
+            self.cooking_tab.setText("暂无推荐的烹饪方法")
+            return
+
+        lines = []
+        for m in methods:
+            parts = [f"🍽 {m.method_name}"]
+            if m.cooking_time:
+                parts.append(f"⏱{m.cooking_time}")
+            if m.ingredients:
+                parts.append(f"🥬{m.ingredients}")
+            lines.append("  |  ".join(parts))
+
+        self.cooking_tab.setText("\n".join(lines))
 
     def _create_veg_card(self, vegetable) -> QFrame:
         """创建蔬菜推荐卡片"""

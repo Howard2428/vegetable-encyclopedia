@@ -6,6 +6,7 @@
 from service.vegetable_service import VegetableService
 from entity.vegetable import Vegetable
 from ui.styles import GLOBAL_STYLE, CARD_BG
+from typing import Optional
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
@@ -218,9 +219,16 @@ class AdminWindow(QDialog):
     def _add_vegetable(self):
         """新增蔬菜"""
         veg = Vegetable()
-        if self._show_veg_dialog(veg, "新增蔬菜"):
+        accepted, cooking_methods = self._show_veg_dialog(veg, "新增蔬菜")
+        if accepted:
             success, msg = self.vegetable_service.add_vegetable(veg)
             if success:
+                # 获取刚插入的蔬菜ID并保存烹饪方法
+                new_veg = self.vegetable_service.vegetable_dao.get_by_name(veg.name)
+                if new_veg and cooking_methods:
+                    self.vegetable_service.replace_cooking_methods(
+                        new_veg.veg_id, cooking_methods
+                    )
                 self._load_vegetables()
                 QMessageBox.information(self, "成功", msg)
             else:
@@ -234,13 +242,19 @@ class AdminWindow(QDialog):
             return
         veg_id = int(self.veg_table.item(row, 0).text())
         veg = self.vegetable_service.get_vegetable_by_id(veg_id)
-        if veg and self._show_veg_dialog(veg, "编辑蔬菜"):
-            success, msg = self.vegetable_service.update_vegetable(veg)
-            if success:
-                self._load_vegetables()
-                QMessageBox.information(self, "成功", msg)
-            else:
-                QMessageBox.warning(self, "失败", msg)
+        if veg:
+            accepted, cooking_methods = self._show_veg_dialog(veg, "编辑蔬菜")
+            if accepted:
+                success, msg = self.vegetable_service.update_vegetable(veg)
+                if success:
+                    # 替换烹饪方法
+                    self.vegetable_service.replace_cooking_methods(
+                        veg_id, cooking_methods
+                    )
+                    self._load_vegetables()
+                    QMessageBox.information(self, "成功", msg)
+                else:
+                    QMessageBox.warning(self, "失败", msg)
 
     def _delete_vegetable(self):
         """删除蔬菜"""
@@ -263,17 +277,25 @@ class AdminWindow(QDialog):
             else:
                 QMessageBox.warning(self, "失败", msg)
 
-    def _show_veg_dialog(self, veg: Vegetable, title: str) -> bool:
-        """显示蔬菜编辑对话框"""
+    def _show_veg_dialog(self, veg: Vegetable, title: str) -> tuple:
+        """显示蔬菜编辑对话框，返回 (accepted, cooking_methods_list)"""
+        from entity.cooking_method import CookingMethod
+
         dlg = QDialog(self)
         dlg.setWindowTitle(title)
-        dlg.setFixedSize(500, 520)
+        dlg.setFixedSize(520, 680)
         dlg.setStyleSheet(GLOBAL_STYLE)
         dlg.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
 
-        layout = QFormLayout(dlg)
-        layout.setSpacing(10)
-        layout.setContentsMargins(25, 20, 25, 20)
+        # 使用滚动区容纳所有输入控件
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("QScrollArea { border: none; }")
+
+        form_widget = QWidget()
+        layout = QFormLayout(form_widget)
+        layout.setSpacing(8)
+        layout.setContentsMargins(25, 15, 25, 15)
 
         name_input = QLineEdit(veg.name)
         name_input.setPlaceholderText("必填")
@@ -305,22 +327,22 @@ class AdminWindow(QDialog):
         nutrition_text = QTextEdit()
         nutrition_text.setPlaceholderText("输入营养功效说明...")
         nutrition_text.setText(veg.nutrition or '')
-        nutrition_text.setMaximumHeight(100)
+        nutrition_text.setMaximumHeight(80)
         layout.addRow("营养功效：", nutrition_text)
 
         purchase_text = QTextEdit()
         purchase_text.setPlaceholderText("输入选购技巧...")
         purchase_text.setText(veg.purchase_tips or '')
-        purchase_text.setMaximumHeight(80)
+        purchase_text.setMaximumHeight(60)
         layout.addRow("选购技巧：", purchase_text)
 
         storage_text = QTextEdit()
         storage_text.setPlaceholderText("输入储存方法...")
         storage_text.setText(veg.storage_method or '')
-        storage_text.setMaximumHeight(80)
+        storage_text.setMaximumHeight(60)
         layout.addRow("储存方法：", storage_text)
 
-        # 图片路径（可选，留空则自动按名称查找）
+        # 图片路径
         img_layout = QHBoxLayout()
         img_path_input = QLineEdit(veg.image_path or '')
         img_path_input.setPlaceholderText("留空自动匹配 data/images/蔬菜名.jpg")
@@ -338,7 +360,158 @@ class AdminWindow(QDialog):
         img_layout.addWidget(browse_btn)
         layout.addRow("图片路径：", img_layout)
 
-        btn_layout = QHBoxLayout()
+        # ========== 烹饪方法管理 ==========
+        cooking_section = QLabel("🍳 推荐的烹饪方法")
+        cooking_section.setStyleSheet(
+            "font-weight: bold; font-size: 14px; color: #2E7D32; "
+            "padding-top: 10px; margin-top: 5px;"
+        )
+        layout.addRow(cooking_section)
+
+        # 加载已有的烹饪方法
+        cooking_methods: list[CookingMethod] = []
+        if veg.veg_id:
+            cooking_methods = self.vegetable_service.get_cooking_methods(veg.veg_id)
+
+        # 烹饪方法列表
+        cooking_list = QListWidget()
+        cooking_list.setMaximumHeight(100)
+        cooking_list.setStyleSheet(
+            "QListWidget { border: 1px solid #E0E0E0; border-radius: 4px; "
+            "background-color: white; } "
+            "QListWidget::item { padding: 4px 8px; }"
+        )
+        layout.addRow(cooking_list)
+
+        def _refresh_cooking_list():
+            cooking_list.clear()
+            for cm in cooking_methods:
+                parts = [f"🍽 {cm.method_name}"]
+                if cm.cooking_time:
+                    parts.append(f"⏱{cm.cooking_time}")
+                if cm.ingredients:
+                    parts.append(f"🥬{cm.ingredients}")
+                cooking_list.addItem("  |  ".join(parts))
+
+        _refresh_cooking_list()
+
+        # 烹饪方法操作按钮
+        cooking_btn_layout = QHBoxLayout()
+        cooking_btn_layout.setSpacing(8)
+
+        def _open_cooking_dialog(method: Optional[CookingMethod] = None):
+            """打开烹饪方法编辑弹窗"""
+            edit_dlg = QDialog(dlg)
+            edit_dlg.setWindowTitle(
+                "编辑烹饪方法" if method else "新增烹饪方法"
+            )
+            edit_dlg.setFixedSize(400, 220)
+            edit_dlg.setStyleSheet(GLOBAL_STYLE)
+            edit_dlg.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+
+            edit_layout = QFormLayout(edit_dlg)
+            edit_layout.setSpacing(10)
+            edit_layout.setContentsMargins(20, 15, 20, 15)
+
+            method_input = QComboBox()
+            method_input.setEditable(True)
+            method_input.addItems([
+                '清炒', '蒜蓉', '煲汤', '红烧', '清蒸', '凉拌',
+                '白灼', '炖煮', '爆炒', '炝炒', '干煸', '焖煮',
+                '烤制', '涮火锅', '腌制', '糖醋', '水煮', '葱油',
+                '酱烧', '上汤', '干锅', '生炒', '煲仔', '煎',
+            ])
+            if method and method.method_name:
+                method_input.setCurrentText(method.method_name)
+            edit_layout.addRow("烹饪方法 *：", method_input)
+
+            time_input = QLineEdit(method.cooking_time if method else '')
+            time_input.setPlaceholderText("如：15分钟、30分钟...")
+            edit_layout.addRow("烹饪时间：", time_input)
+
+            ing_input = QLineEdit(method.ingredients if method else '')
+            ing_input.setPlaceholderText("如：姜片、蒜末、枸杞...")
+            edit_layout.addRow("搭配辅料：", ing_input)
+
+            edit_btn_layout = QHBoxLayout()
+            edit_ok_btn = QPushButton("确 定")
+            edit_cancel_btn = QPushButton("取 消")
+            edit_cancel_btn.setProperty("cssClass", "secondary")
+            edit_ok_btn.clicked.connect(edit_dlg.accept)
+            edit_cancel_btn.clicked.connect(edit_dlg.reject)
+            edit_btn_layout.addWidget(edit_ok_btn)
+            edit_btn_layout.addWidget(edit_cancel_btn)
+            edit_layout.addRow(edit_btn_layout)
+
+            if edit_dlg.exec() == QDialog.Accepted:
+                m_name = method_input.currentText().strip()
+                if not m_name:
+                    QMessageBox.warning(edit_dlg, "提示", "烹饪方法名称不能为空")
+                    return
+
+                if method is None:
+                    method = CookingMethod()
+                    cooking_methods.append(method)
+
+                method.method_name = m_name
+                method.cooking_time = time_input.text().strip()
+                method.ingredients = ing_input.text().strip()
+                _refresh_cooking_list()
+
+        add_cooking_btn = QPushButton("+ 添加")
+        add_cooking_btn.setStyleSheet(
+            "QPushButton { background-color: #4CAF50; color: white; border: none; "
+            "border-radius: 4px; padding: 4px 12px; font-size: 12px; } "
+            "QPushButton:hover { background-color: #43A047; }"
+        )
+        add_cooking_btn.clicked.connect(lambda: _open_cooking_dialog())
+        cooking_btn_layout.addWidget(add_cooking_btn)
+
+        edit_cooking_btn = QPushButton("编辑选中")
+        edit_cooking_btn.setStyleSheet(
+            "QPushButton { background-color: #2196F3; color: white; border: none; "
+            "border-radius: 4px; padding: 4px 12px; font-size: 12px; } "
+            "QPushButton:hover { background-color: #1E88E5; }"
+        )
+        edit_cooking_btn.clicked.connect(lambda: (
+            _open_cooking_dialog(cooking_methods[cooking_list.currentRow()])
+            if cooking_list.currentRow() >= 0 else None
+        ))
+        cooking_btn_layout.addWidget(edit_cooking_btn)
+
+        del_cooking_btn = QPushButton("删除选中")
+        del_cooking_btn.setStyleSheet(
+            "QPushButton { background-color: #F44336; color: white; border: none; "
+            "border-radius: 4px; padding: 4px 12px; font-size: 12px; } "
+            "QPushButton:hover { background-color: #E53935; }"
+        )
+        del_cooking_btn.clicked.connect(lambda: (
+            cooking_methods.pop(cooking_list.currentRow())
+            or _refresh_cooking_list()
+            if cooking_list.currentRow() >= 0 else None
+        ))
+        cooking_btn_layout.addWidget(del_cooking_btn)
+
+        cooking_btn_layout.addStretch()
+
+        cooking_btn_widget = QWidget()
+        cooking_btn_widget.setLayout(cooking_btn_layout)
+        layout.addRow(cooking_btn_widget)
+
+        scroll.setWidget(form_widget)
+
+        # 主对话框布局
+        dlg_layout = QVBoxLayout(dlg)
+        dlg_layout.setContentsMargins(0, 0, 0, 0)
+        dlg_layout.setSpacing(0)
+        dlg_layout.addWidget(scroll)
+
+        # 底部按钮
+        btn_widget = QWidget()
+        btn_widget.setStyleSheet("background-color: white;")
+        btn_layout = QHBoxLayout(btn_widget)
+        btn_layout.setContentsMargins(25, 10, 25, 15)
+        btn_layout.setSpacing(10)
         ok_btn = QPushButton("保 存")
         cancel_btn = QPushButton("取 消")
         cancel_btn.setProperty("cssClass", "secondary")
@@ -346,7 +519,7 @@ class AdminWindow(QDialog):
         cancel_btn.clicked.connect(dlg.reject)
         btn_layout.addWidget(ok_btn)
         btn_layout.addWidget(cancel_btn)
-        layout.addRow(btn_layout)
+        dlg_layout.addWidget(btn_widget)
 
         if dlg.exec() == QDialog.Accepted:
             veg.name = name_input.text().strip()
@@ -358,8 +531,8 @@ class AdminWindow(QDialog):
             veg.purchase_tips = purchase_text.toPlainText().strip()
             veg.storage_method = storage_text.toPlainText().strip()
             veg.image_path = img_path_input.text().strip()
-            return True
-        return False
+            return True, cooking_methods
+        return False, []
 
     def _create_recipe_page(self) -> QWidget:
         page = QWidget()

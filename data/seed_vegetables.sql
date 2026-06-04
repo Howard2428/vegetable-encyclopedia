@@ -80,6 +80,509 @@ INSERT INTO veg_vegetable (veg_name, alias, category, season, nutrition, purchas
 ('紫甘蓝', '紫卷心菜,红甘蓝,紫苞菜', '其他', '秋冬', '富含花青素（天然紫色素）、维生素C和膳食纤维；抗氧化能力出色。', '选球形紧实、色泽紫红均匀、手感沉重的。', '整棵存放阴凉处可保存1-2周；切开后保鲜膜封好冷藏。', 3.50);
 
 -- ============================================================
+-- 烹饪方法推荐数据（≥50种蔬菜的推荐烹饪方法）
+-- 使用子查询按名称匹配蔬菜ID，可安全重复执行
+-- ============================================================
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜末、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '大白菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '30~40分钟', '豆腐、姜片、枸杞'
+FROM veg_vegetable v WHERE v.veg_name = '大白菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炖煮', '20~30分钟', '粉条、五花肉、葱段'
+FROM veg_vegetable v WHERE v.veg_name = '大白菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒜蓉', '3~5分钟', '蒜末、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '菠菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '上汤', '10~15分钟', '皮蛋、咸鸭蛋、蒜瓣'
+FROM veg_vegetable v WHERE v.veg_name = '菠菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟（焯水后）', '芝麻酱、蒜末、香醋'
+FROM veg_vegetable v WHERE v.veg_name = '菠菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟', '蚝油、蒜末、香油'
+FROM veg_vegetable v WHERE v.veg_name = '生菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒜蓉', '3~5分钟', '蒜末、蚝油、生抽'
+FROM veg_vegetable v WHERE v.veg_name = '生菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒜蓉', '3~5分钟', '蒜末、豆豉'
+FROM veg_vegetable v WHERE v.veg_name = '油麦菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜片、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '油麦菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '5~8分钟', '鸡蛋、盐'
+FROM veg_vegetable v WHERE v.veg_name = '韭菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '烤制', '10分钟', '孜然粉、辣椒粉、食用油'
+FROM veg_vegetable v WHERE v.veg_name = '韭菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做馅', '15分钟', '猪肉末、姜末、酱油'
+FROM veg_vegetable v WHERE v.veg_name = '韭菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉丝', '10分钟', '猪里脊、红椒丝、姜丝'
+FROM veg_vegetable v WHERE v.veg_name = '芹菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟（焯水后）', '花生米、胡萝卜丁、香醋'
+FROM veg_vegetable v WHERE v.veg_name = '芹菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜末、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '小白菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '上汤', '10~15分钟', '皮蛋、火腿丁、蒜瓣'
+FROM veg_vegetable v WHERE v.veg_name = '小白菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒜蓉', '3~5分钟', '蒜末、腐乳'
+FROM veg_vegetable v WHERE v.veg_name = '空心菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '爆炒', '5分钟', '干辣椒、豆豉、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '空心菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜片、盐'
+FROM veg_vegetable v WHERE v.veg_name = '茼蒿';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '涮火锅', '1~2分钟', '蘸料（芝麻酱、韭菜花）'
+FROM veg_vegetable v WHERE v.veg_name = '茼蒿';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '3分钟', '香醋、生抽、蒜末、香油'
+FROM veg_vegetable v WHERE v.veg_name = '香菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做配料', '—', '用于提味增香'
+FROM veg_vegetable v WHERE v.veg_name = '香菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜末、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '娃娃菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '上汤', '15分钟', '高汤、枸杞、火腿丝'
+FROM veg_vegetable v WHERE v.veg_name = '娃娃菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '25~35分钟', '排骨、姜片、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '娃娃菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜片、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '苋菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '上汤', '10~15分钟', '皮蛋、蒜瓣、枸杞'
+FROM veg_vegetable v WHERE v.veg_name = '苋菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '红烧', '25~35分钟', '五花肉、八角、桂皮、生抽'
+FROM veg_vegetable v WHERE v.veg_name = '土豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炖牛肉', '40~60分钟', '牛腩、番茄、胡萝卜、洋葱'
+FROM veg_vegetable v WHERE v.veg_name = '土豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒土豆丝', '8~10分钟', '青椒丝、干辣椒、白醋'
+FROM veg_vegetable v WHERE v.veg_name = '土豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~60分钟', '排骨/鸡、玉米、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '胡萝卜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10分钟', '五花肉片、青椒、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '胡萝卜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟', '香菜、白醋、糖、盐'
+FROM veg_vegetable v WHERE v.veg_name = '胡萝卜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '30~50分钟', '排骨、枸杞、姜片、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '白萝卜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '红烧', '20~30分钟', '五花肉、生抽、老抽、八角'
+FROM veg_vegetable v WHERE v.veg_name = '白萝卜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '腌制', '腌制2小时', '白醋、糖、盐、辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '白萝卜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~60分钟', '排骨、红枣、枸杞、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '山药';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '8~10分钟', '木耳、青椒、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '山药';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炖煮', '30~40分钟', '乌鸡、当归、枸杞'
+FROM veg_vegetable v WHERE v.veg_name = '山药';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '烤制', '40~60分钟', '锡纸包裹（可不加辅料）'
+FROM veg_vegetable v WHERE v.veg_name = '红薯';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煮粥', '25~35分钟', '小米/大米、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '红薯';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒸', '20~30分钟', '（可不加辅料）'
+FROM veg_vegetable v WHERE v.veg_name = '红薯';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~60分钟', '排骨、花生、姜片、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '莲藕';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10分钟', '荷兰豆、木耳、胡萝卜片'
+FROM veg_vegetable v WHERE v.veg_name = '莲藕';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟（焯水后）', '白醋、糖、辣椒油、香菜'
+FROM veg_vegetable v WHERE v.veg_name = '莲藕';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '5~8分钟', '鸡蛋、盐'
+FROM veg_vegetable v WHERE v.veg_name = '洋葱';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒牛肉', '10~15分钟', '牛柳、黑胡椒、青椒'
+FROM veg_vegetable v WHERE v.veg_name = '洋葱';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做配料', '—', '用于提香增味'
+FROM veg_vegetable v WHERE v.veg_name = '洋葱';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '红烧', '25~35分钟', '五花肉、生抽、老抽、八角'
+FROM veg_vegetable v WHERE v.veg_name = '芋头';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒸', '20~30分钟', '排骨、豆豉、蒜末'
+FROM veg_vegetable v WHERE v.veg_name = '芋头';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~50分钟', '排骨、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '芋头';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10~15分钟', '五花肉片、青椒、红椒'
+FROM veg_vegetable v WHERE v.veg_name = '竹笋';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~60分钟', '老鸭/排骨、火腿、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '竹笋';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '焖煮', '20~30分钟', '香菇、酱油、糖'
+FROM veg_vegetable v WHERE v.veg_name = '竹笋';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜末、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '莴笋';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟', '香醋、生抽、香油、蒜末'
+FROM veg_vegetable v WHERE v.veg_name = '莴笋';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10分钟', '腊肉、蒜苗、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '莴笋';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '番茄炒蛋', '8~10分钟', '鸡蛋、葱花、糖'
+FROM veg_vegetable v WHERE v.veg_name = '番茄';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '番茄牛腩', '40~60分钟', '牛腩、土豆、洋葱、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '番茄';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '3分钟', '白糖（撒糖生吃）'
+FROM veg_vegetable v WHERE v.veg_name = '番茄';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟', '蒜末、香醋、生抽、辣椒油'
+FROM veg_vegetable v WHERE v.veg_name = '黄瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '5~8分钟', '鸡蛋、木耳'
+FROM veg_vegetable v WHERE v.veg_name = '黄瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '腌制', '腌制30分钟', '酱油、蒜瓣、辣椒、糖'
+FROM veg_vegetable v WHERE v.veg_name = '黄瓜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '红烧', '15~20分钟', '蒜末、生抽、老抽、糖'
+FROM veg_vegetable v WHERE v.veg_name = '茄子';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '鱼香', '10~15分钟', '肉末、豆瓣酱、葱姜蒜、糖醋'
+FROM veg_vegetable v WHERE v.veg_name = '茄子';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '烤制', '15~20分钟', '蒜蓉、辣椒粉、孜然'
+FROM veg_vegetable v WHERE v.veg_name = '茄子';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉丝', '8~10分钟', '猪里脊、豆豉、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '青椒';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '虎皮青椒', '10分钟', '豆豉、蒜末、生抽、醋'
+FROM veg_vegetable v WHERE v.veg_name = '青椒';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '酿肉', '15~20分钟', '猪肉馅、香菇、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '青椒';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清蒸', '20~30分钟', '蒜蓉、粉丝、生抽'
+FROM veg_vegetable v WHERE v.veg_name = '南瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '南瓜粥', '25~35分钟', '小米/大米、枸杞'
+FROM veg_vegetable v WHERE v.veg_name = '南瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~50分钟', '排骨、玉米、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '南瓜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '30~40分钟', '排骨、薏米、姜片、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '冬瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '红烧', '15~20分钟', '虾皮、生抽、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '冬瓜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '8~10分钟', '鸡蛋、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '苦瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '酿肉', '15~20分钟', '猪肉馅、香菇、枸杞'
+FROM veg_vegetable v WHERE v.veg_name = '苦瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '30~40分钟', '排骨、黄豆、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '苦瓜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜末、鸡蛋'
+FROM veg_vegetable v WHERE v.veg_name = '丝瓜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '20~30分钟', '鸡蛋、虾皮、姜丝'
+FROM veg_vegetable v WHERE v.veg_name = '丝瓜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '8~10分钟', '鸡蛋、番茄'
+FROM veg_vegetable v WHERE v.veg_name = '西葫芦';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜片、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '西葫芦';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '爆炒', '5~8分钟', '五花肉片、豆豉、蒜苗'
+FROM veg_vegetable v WHERE v.veg_name = '辣椒';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做蘸料', '—', '酱油、蒜末'
+FROM veg_vegetable v WHERE v.veg_name = '辣椒';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '白灼', '3~5分钟', '酱油、芥末/蒜蓉'
+FROM veg_vegetable v WHERE v.veg_name = '秋葵';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '8分钟', '鸡蛋、蒜末'
+FROM veg_vegetable v WHERE v.veg_name = '秋葵';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟', '生抽、芥末、芝麻'
+FROM veg_vegetable v WHERE v.veg_name = '秋葵';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒜蓉', '5~8分钟', '蒜末、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '西兰花';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒虾仁', '10分钟', '虾仁、胡萝卜片、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '西兰花';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '白灼', '3~5分钟', '生抽、蒜蓉、香油'
+FROM veg_vegetable v WHERE v.veg_name = '西兰花';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炖鸡', '40~60分钟', '土鸡、红枣、枸杞、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '香菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒青菜', '5~8分钟', '油菜/上海青、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '香菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~50分钟', '排骨、姜片、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '香菇';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '3分钟（焯水后）', '蒜末、辣椒油、香醋、生抽'
+FROM veg_vegetable v WHERE v.veg_name = '金针菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '15~20分钟', '番茄、豆腐、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '金针菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '涮火锅', '1~2分钟', '蘸料（芝麻酱、韭菜花）'
+FROM veg_vegetable v WHERE v.veg_name = '金针菇';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10分钟', '五花肉片、青椒、蒜苗'
+FROM veg_vegetable v WHERE v.veg_name = '平菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '15~20分钟', '鸡蛋、豆腐、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '平菇';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '干煸', '10~15分钟', '干辣椒、花椒、芹菜'
+FROM veg_vegetable v WHERE v.veg_name = '杏鲍菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '红烧', '15~20分钟', '生抽、老抽、糖、姜片'
+FROM veg_vegetable v WHERE v.veg_name = '杏鲍菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '酱烧', '10~15分钟', '蚝油、豆瓣酱、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '杏鲍菇';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '干锅', '15~20分钟', '五花肉片、干辣椒、蒜苗'
+FROM veg_vegetable v WHERE v.veg_name = '茶树菇';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '30~40分钟', '土鸡/排骨、红枣、枸杞'
+FROM veg_vegetable v WHERE v.veg_name = '茶树菇';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟（泡发焯水后）', '蒜末、辣椒油、香醋、生抽、黄瓜丝'
+FROM veg_vegetable v WHERE v.veg_name = '木耳';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒鸡蛋', '8~10分钟', '鸡蛋、青椒、胡萝卜片'
+FROM veg_vegetable v WHERE v.veg_name = '木耳';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10~15分钟', '猪里脊、黄瓜片、姜蒜'
+FROM veg_vegetable v WHERE v.veg_name = '木耳';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~60分钟', '红枣、莲子、枸杞、冰糖'
+FROM veg_vegetable v WHERE v.veg_name = '银耳';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟（泡发焯水后）', '黄瓜丝、蒜末、香醋、香菜'
+FROM veg_vegetable v WHERE v.veg_name = '银耳';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉片', '10分钟', '五花肉片、青椒、洋葱'
+FROM veg_vegetable v WHERE v.veg_name = '口蘑';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '15~20分钟', '豆腐、鸡蛋、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '口蘑';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '烤制', '10~15分钟', '黄油、黑胡椒、盐'
+FROM veg_vegetable v WHERE v.veg_name = '口蘑';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '干煸', '10~15分钟', '肉末、芽菜/榄菜、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '四季豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '焖面', '20~25分钟', '面条、五花肉、土豆条'
+FROM veg_vegetable v WHERE v.veg_name = '四季豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉丝', '10分钟', '猪里脊、干辣椒、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '四季豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉末', '10分钟', '猪肉末、干辣椒、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '豇豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟（焯水后）', '芝麻酱、蒜末、香醋'
+FROM veg_vegetable v WHERE v.veg_name = '豇豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '腌制', '腌制1~2天', '盐、花椒、八角、白酒'
+FROM veg_vegetable v WHERE v.veg_name = '豇豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '水煮', '15~20分钟', '八角、花椒、盐'
+FROM veg_vegetable v WHERE v.veg_name = '毛豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉末', '10分钟', '猪肉末、雪菜/萝卜干、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '毛豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒虾仁', '10分钟', '虾仁、玉米粒、胡萝卜丁'
+FROM veg_vegetable v WHERE v.veg_name = '豌豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煮汤', '10~15分钟', '鸡蛋、豆腐、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '豌豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '葱油炒', '10~15分钟', '葱段、盐、油'
+FROM veg_vegetable v WHERE v.veg_name = '蚕豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煮汤', '15~20分钟', '火腿、春笋、葱花'
+FROM veg_vegetable v WHERE v.veg_name = '蚕豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉丝', '8~10分钟', '猪里脊、韭菜/蒜苗'
+FROM veg_vegetable v WHERE v.veg_name = '豆芽';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '3分钟（焯水后）', '辣椒油、香醋、蒜末、香菜'
+FROM veg_vegetable v WHERE v.veg_name = '豆芽';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '水煮鱼底料', '1~2分钟', '水煮鱼/水煮肉片铺底'
+FROM veg_vegetable v WHERE v.veg_name = '豆芽';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒肉丝', '10分钟', '猪里脊、蒜片、干辣椒'
+FROM veg_vegetable v WHERE v.veg_name = '扁豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '焖面', '20~25分钟', '面条、五花肉、土豆'
+FROM veg_vegetable v WHERE v.veg_name = '扁豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '蒜蓉', '3~5分钟', '蒜末、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '荷兰豆';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒腊肉', '10分钟', '腊肉片、蒜片'
+FROM veg_vegetable v WHERE v.veg_name = '荷兰豆';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煮', '15~20分钟', '盐'
+FROM veg_vegetable v WHERE v.veg_name = '玉米';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煲汤', '40~60分钟', '排骨、胡萝卜、姜片、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '玉米';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '烤制', '15~20分钟', '黄油、盐'
+FROM veg_vegetable v WHERE v.veg_name = '玉米';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '清炒', '5~8分钟', '蒜片、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '花菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '干锅', '15~20分钟', '五花肉片、干辣椒、蒜苗、豆瓣酱'
+FROM veg_vegetable v WHERE v.veg_name = '花菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做配料', '—', '炒菜/炖肉时用作调味'
+FROM veg_vegetable v WHERE v.veg_name = '大蒜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '烤制', '10分钟', '整头烤制（淋橄榄油）'
+FROM veg_vegetable v WHERE v.veg_name = '大蒜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做配料', '—', '炒菜/炖肉/煲汤时用作调味'
+FROM veg_vegetable v WHERE v.veg_name = '姜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '煮红糖水', '15~20分钟', '红糖、红枣'
+FROM veg_vegetable v WHERE v.veg_name = '姜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做配料', '—', '炒菜/煲汤/拌馅时用作调味和点缀'
+FROM veg_vegetable v WHERE v.veg_name = '葱';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '葱油拌面', '10分钟', '面条、酱油、食用油'
+FROM veg_vegetable v WHERE v.veg_name = '葱';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '白灼', '3~5分钟', '蚝油、蒜蓉'
+FROM veg_vegetable v WHERE v.veg_name = '芥蓝';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '炒牛肉', '10分钟', '牛柳、姜丝、蚝油'
+FROM veg_vegetable v WHERE v.veg_name = '芥蓝';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '手撕包菜', '8~10分钟', '干辣椒、五花肉片、蒜片、醋'
+FROM veg_vegetable v WHERE v.veg_name = '卷心菜';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做泡菜', '腌制1~3天', '盐、辣椒粉、鱼露、蒜末'
+FROM veg_vegetable v WHERE v.veg_name = '卷心菜';
+
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '凉拌', '5分钟', '白醋、糖、盐、橄榄油'
+FROM veg_vegetable v WHERE v.veg_name = '紫甘蓝';
+INSERT OR IGNORE INTO veg_cooking_method (veg_id, method_name, cooking_time, ingredients)
+SELECT v.veg_id, '做沙拉', '5分钟', '沙拉酱/油醋汁、玉米粒'
+FROM veg_vegetable v WHERE v.veg_name = '紫甘蓝';
+
+-- ============================================================
 -- 预置测试账号
 -- 密码均为明文，将由应用首次启动时通过bcrypt加密
 -- test: Test1234 (普通用户)

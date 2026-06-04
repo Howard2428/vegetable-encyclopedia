@@ -481,6 +481,7 @@ class MainWindow(QMainWindow):
             self.collection_service,
             self.user_service,
             browse_history_dao=self.browse_history_dao,
+            vegetable_service=self.vegetable_service,
             parent=self,
         )
         detail_win.exec()
@@ -504,6 +505,7 @@ class MainWindow(QMainWindow):
             self.search_service,
             self.recommendation_service,
             browse_history_dao=self.browse_history_dao,
+            vegetable_service=self.vegetable_service,
             parent=self,
         )
         user_center.exec()

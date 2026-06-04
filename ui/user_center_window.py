@@ -44,13 +44,15 @@ class UserCenterWindow(QDialog):
 
     def __init__(self, user_service, collection_service,
                  search_service, recommendation_service,
-                 browse_history_dao=None, parent=None):
+                 browse_history_dao=None, vegetable_service=None,
+                 parent=None):
         super().__init__(parent)
         self.user_service = user_service
         self.collection_service = collection_service
         self.search_service = search_service
         self.recommendation_service = recommendation_service
         self.browse_history_dao = browse_history_dao
+        self.vegetable_service = vegetable_service
         self._fav_vegetables = []
         self._custom_vegetables = []
         self._history_vegetables = []
@@ -540,6 +542,7 @@ class UserCenterWindow(QDialog):
             self.collection_service,
             self.user_service,
             browse_history_dao=self.browse_history_dao,
+            vegetable_service=self.vegetable_service,
             parent=self,
         )
         detail_win.exec()

@@ -64,6 +64,21 @@ def init_database():
         print("[OK] 数据库迁移：已创建浏览历史表")
     except Exception:
         pass
+    try:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS veg_cooking_method (
+                method_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                veg_id       INTEGER      NOT NULL,
+                method_name  VARCHAR(50)  NOT NULL,
+                cooking_time VARCHAR(50),
+                ingredients  VARCHAR(200),
+                create_time  DATETIME     NOT NULL DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY (veg_id) REFERENCES veg_vegetable(veg_id) ON DELETE CASCADE
+            )
+        """)
+        print("[OK] 数据库迁移：已创建烹饪方法表")
+    except Exception:
+        pass
 
     # 3. 导入种子蔬菜数据
     from dao.vegetable_dao import VegetableDAO
@@ -80,10 +95,10 @@ def init_database():
         cursor = conn.cursor()
         for part in sql_content.split(';'):
             part = part.strip()
-            if 'INSERT INTO' not in part.upper():
+            if 'INSERT' not in part.upper():
                 continue
             # 从INSERT关键字开始截取SQL语句
-            idx = part.upper().find('INSERT INTO')
+            idx = part.upper().find('INSERT')
             stmt = part[idx:]
             try:
                 cursor.execute(stmt)
@@ -120,7 +135,38 @@ def init_database():
 
     conn.commit()
 
-    # 5. 导入菜谱数据（如果尚未导入）
+    # 5. 导入烹饪方法种子数据（如果表为空）
+    try:
+        cursor.execute("SELECT COUNT(*) as cnt FROM veg_cooking_method")
+        cooking_count = cursor.fetchone()['cnt']
+        if cooking_count == 0:
+            seed_sql = os.path.join(data_dir, 'seed_vegetables.sql')
+            with open(seed_sql, 'r', encoding='utf-8') as f:
+                sql_content = f.read()
+            conn = DBManager.get_connection()
+            cursor2 = conn.cursor()
+            cooking_inserts = 0
+            for part in sql_content.split(';'):
+                part = part.strip()
+                if 'INSERT' not in part.upper():
+                    continue
+                if 'veg_cooking_method' not in part.lower():
+                    continue
+                idx = part.upper().find('INSERT')
+                stmt = part[idx:]
+                try:
+                    cursor2.execute(stmt)
+                    cooking_inserts += 1
+                except Exception as e:
+                    print(f"  [WARN] 跳过重复烹饪方法: {str(e)[:60]}")
+            conn.commit()
+            print(f"[OK] 烹饪方法种子数据已导入（共{cooking_inserts}条）")
+        else:
+            print(f"[OK] 烹饪方法数据已存在（共{cooking_count}条）")
+    except Exception as e:
+        print(f"  [WARN] 烹饪方法表初始化: {str(e)[:60]}")
+
+    # 6. 导入菜谱数据（如果尚未导入）
     recipe_dao = RecipeDAO()
     if recipe_dao.get_recipe_count() == 0:
         recipes_json = os.path.join(data_dir, 'recipes.json')
