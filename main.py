@@ -7,6 +7,7 @@
 
 import sys
 import os
+import logging
 
 # 确保当前目录在路径中
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -16,6 +17,12 @@ from PySide6.QtCore import Qt
 
 from utils.db_manager import DBManager
 from utils.password_utils import hash_password
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(levelname)s] %(name)s: %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 def get_data_dir() -> str:
@@ -43,13 +50,15 @@ def init_database():
     try:
         cursor.execute("ALTER TABLE sys_user ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'")
         print("[OK] 数据库迁移：已添加role列")
-    except Exception:
-        pass
+    except Exception as e:
+        if 'duplicate column' not in str(e).lower() and 'already exists' not in str(e).lower():
+            logger.warning("迁移 role 列失败: %s", e)
     try:
         cursor.execute("ALTER TABLE veg_vegetable ADD COLUMN image_path VARCHAR(255)")
         print("[OK] 数据库迁移：已添加image_path列")
-    except Exception:
-        pass
+    except Exception as e:
+        if 'duplicate column' not in str(e).lower() and 'already exists' not in str(e).lower():
+            logger.warning("迁移 image_path 列失败: %s", e)
     try:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS veg_browse_history (
@@ -62,8 +71,8 @@ def init_database():
             )
         """)
         print("[OK] 数据库迁移：已创建浏览历史表")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("创建浏览历史表失败: %s", e)
     try:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS veg_cooking_method (
@@ -77,8 +86,8 @@ def init_database():
             )
         """)
         print("[OK] 数据库迁移：已创建烹饪方法表")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("创建烹饪方法表失败: %s", e)
 
     # 3. 导入种子蔬菜数据
     from dao.vegetable_dao import VegetableDAO
@@ -146,6 +155,7 @@ def init_database():
             conn = DBManager.get_connection()
             cursor2 = conn.cursor()
             cooking_inserts = 0
+            cooking_errors = 0
             for part in sql_content.split(';'):
                 part = part.strip()
                 if 'INSERT' not in part.upper():
@@ -158,13 +168,17 @@ def init_database():
                     cursor2.execute(stmt)
                     cooking_inserts += 1
                 except Exception as e:
-                    print(f"  [WARN] 跳过重复烹饪方法: {str(e)[:60]}")
+                    cooking_errors += 1
+                    logger.debug("跳过烹饪方法记录: %s", e)
             conn.commit()
+            if cooking_errors > 0:
+                logger.warning("烹饪方法导入完成，%d条成功，%d条跳过",
+                               cooking_inserts, cooking_errors)
             print(f"[OK] 烹饪方法种子数据已导入（共{cooking_inserts}条）")
         else:
             print(f"[OK] 烹饪方法数据已存在（共{cooking_count}条）")
     except Exception as e:
-        print(f"  [WARN] 烹饪方法表初始化: {str(e)[:60]}")
+        logger.error("烹饪方法表初始化失败: %s", e)
 
     # 6. 导入菜谱数据（如果尚未导入）
     recipe_dao = RecipeDAO()

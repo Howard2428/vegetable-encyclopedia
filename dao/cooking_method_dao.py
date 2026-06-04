@@ -5,11 +5,14 @@
 
 import sys
 import os
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List, Optional
 from dao.base_dao import BaseDAO
 from entity.cooking_method import CookingMethod
+
+logger = logging.getLogger(__name__)
 
 
 class CookingMethodDAO(BaseDAO):
@@ -76,7 +79,7 @@ class CookingMethodDAO(BaseDAO):
     def replace_all_for_veg(self, veg_id: int,
                             methods: List[CookingMethod]) -> int:
         """
-        替换某个蔬菜的全部烹饪方法（先删后插）
+        替换某个蔬菜的全部烹饪方法（事务安全：先删后插，失败时回滚）
 
         Args:
             veg_id: 蔬菜ID
@@ -84,11 +87,30 @@ class CookingMethodDAO(BaseDAO):
 
         Returns:
             插入的条数
+
+        Raises:
+            RuntimeError: 当替换操作失败时（已回滚）
         """
-        self.delete_by_veg_id(veg_id)
-        count = 0
-        for method in methods:
-            method.veg_id = veg_id
-            self.insert(method)
-            count += 1
-        return count
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            delete_sql = "DELETE FROM veg_cooking_method WHERE veg_id = ?"
+            cursor.execute(delete_sql, (veg_id,))
+
+            insert_sql = """
+                INSERT INTO veg_cooking_method
+                (veg_id, method_name, cooking_time, ingredients, create_time)
+                VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+            """
+            for method in methods:
+                method.veg_id = veg_id
+                cursor.execute(insert_sql, (
+                    method.veg_id, method.method_name,
+                    method.cooking_time, method.ingredients
+                ))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            logger.error("替换烹饪方法失败(veg_id=%d)，已回滚: %s", veg_id, e)
+            raise RuntimeError(f"替换烹饪方法失败: {e}") from e
+        return len(methods)

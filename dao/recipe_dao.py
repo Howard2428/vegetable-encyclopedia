@@ -7,10 +7,13 @@
 import sys
 import os
 import json
+import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from typing import List, Dict
 from dao.base_dao import BaseDAO
+
+logger = logging.getLogger(__name__)
 
 
 class RecipeDAO(BaseDAO):
@@ -22,7 +25,7 @@ class RecipeDAO(BaseDAO):
         self._ensure_table()
 
     def _ensure_table(self):
-        """确保菜谱表存在（数据库未初始化时静默跳过）"""
+        """确保菜谱表存在（数据库未初始化时记录警告）"""
         sql = """
             CREATE TABLE IF NOT EXISTS veg_recipe (
                 recipe_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,8 +37,8 @@ class RecipeDAO(BaseDAO):
         """
         try:
             self.execute_update(sql)
-        except RuntimeError:
-            pass  # 数据库尚未初始化，稍后重试
+        except RuntimeError as e:
+            logger.warning("菜谱表创建跳过（数据库可能尚未初始化）: %s", e)
 
     def import_from_json(self, filepath: str) -> int:
         """
@@ -46,14 +49,23 @@ class RecipeDAO(BaseDAO):
 
         Returns:
             导入的菜谱数量
+
+        Raises:
+            FileNotFoundError: 当JSON文件不存在时
+            json.JSONDecodeError: 当JSON文件格式无效时
         """
         self._ensure_table()  # 确保表存在
         with open(filepath, 'r', encoding='utf-8') as f:
             recipes = json.load(f)
 
         count = 0
+        skipped = 0
         for recipe in recipes:
             name = recipe.get('name', '')
+            if not name:
+                skipped += 1
+                logger.debug("跳过无名菜谱记录")
+                continue
             ingredients = json.dumps(
                 recipe.get('ingredients', []), ensure_ascii=False
             )
@@ -64,9 +76,12 @@ class RecipeDAO(BaseDAO):
             try:
                 self.execute_update(sql, (name, ingredients))
                 count += 1
-            except Exception:
-                continue  # 跳过重复或无效数据
+            except RuntimeError as e:
+                skipped += 1
+                logger.debug("跳过菜谱记录 '%s': %s", name, e)
 
+        if skipped > 0:
+            logger.info("菜谱导入完成: %d条成功, %d条跳过", count, skipped)
         return count
 
     def get_all_recipes(self) -> List[Dict]:

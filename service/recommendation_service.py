@@ -5,6 +5,7 @@
 
 import sys
 import os
+import logging
 from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,6 +13,8 @@ from typing import List
 from entity.vegetable import Vegetable
 from dao.vegetable_dao import VegetableDAO
 from dao.association_rule_dao import AssociationRuleDAO
+
+logger = logging.getLogger(__name__)
 
 
 class RecommendationService:
@@ -81,11 +84,17 @@ class RecommendationService:
 
     def increment_favorite_count(self, veg_id: int) -> None:
         """增加蔬菜收藏量（BR-06：实时更新）"""
-        self.vegetable_dao.increment_favorite_count(veg_id)
+        try:
+            self.vegetable_dao.increment_favorite_count(veg_id)
+        except RuntimeError as e:
+            logger.error("更新收藏量失败(veg_id=%d): %s", veg_id, e)
 
     def decrement_favorite_count(self, veg_id: int) -> None:
         """减少蔬菜收藏量"""
-        self.vegetable_dao.decrement_favorite_count(veg_id)
+        try:
+            self.vegetable_dao.decrement_favorite_count(veg_id)
+        except RuntimeError as e:
+            logger.error("更新收藏量失败(veg_id=%d): %s", veg_id, e)
 
     def get_rule_count(self) -> int:
         """获取当前规则库数量"""
