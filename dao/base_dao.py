@@ -85,3 +85,21 @@ class BaseDAO:
             所有匹配记录列表
         """
         return self.execute_query(sql, params)
+
+    def count(self, table: str, where: str = '', params: tuple = ()) -> int:
+        """
+        统计记录数
+
+        Args:
+            table: 表名
+            where: 可选的WHERE子句（不含WHERE关键字）
+            params: WHERE子句的参数
+
+        Returns:
+            记录数
+        """
+        sql = f"SELECT COUNT(*) as cnt FROM {table}"
+        if where:
+            sql += f" WHERE {where}"
+        row = self.fetch_one(sql, params)
+        return row['cnt'] if row else 0

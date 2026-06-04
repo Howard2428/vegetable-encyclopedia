@@ -62,6 +62,4 @@ class BrowseHistoryDAO(BaseDAO):
 
     def get_count(self, user_id: int) -> int:
         """统计用户浏览历史条数"""
-        sql = "SELECT COUNT(*) as cnt FROM veg_browse_history WHERE user_id = ?"
-        row = self.fetch_one(sql, (user_id,))
-        return row['cnt'] if row else 0
+        return self.count('veg_browse_history', 'user_id = ?', (user_id,))

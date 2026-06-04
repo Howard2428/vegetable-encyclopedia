@@ -3,7 +3,7 @@
 展示蔬菜的完整百科信息，支持收藏和关联推荐。
 """
 
-from ui.styles import GLOBAL_STYLE, PRIMARY_COLOR, CARD_BG
+from ui.styles import GLOBAL_STYLE, PRIMARY_COLOR, CARD_BG, SECONDARY_BTN_STYLE
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -51,12 +51,7 @@ class VegetableDetailWindow(QDialog):
         top_layout = QHBoxLayout()
 
         self.back_btn = QPushButton("← 返回")
-        self.back_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 6px 14px; "
-            "font-size: 13px; font-weight: bold; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        self.back_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         self.back_btn.setFixedWidth(80)
         self.back_btn.clicked.connect(self._go_back)
         top_layout.addWidget(self.back_btn)
@@ -325,12 +320,7 @@ class VegetableDetailWindow(QDialog):
         btn_layout.addWidget(ok_btn)
 
         new_btn = QPushButton("+ 新建收藏夹")
-        new_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 14px; "
-            "font-size: 14px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        new_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         btn_layout.addWidget(new_btn)
         layout.addLayout(btn_layout)
 
@@ -409,12 +399,7 @@ class VegetableDetailWindow(QDialog):
         btn_layout.addWidget(ok_btn)
 
         new_btn = QPushButton("+ 新建清单")
-        new_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 14px; "
-            "font-size: 14px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        new_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         btn_layout.addWidget(new_btn)
         layout.addLayout(btn_layout)
 

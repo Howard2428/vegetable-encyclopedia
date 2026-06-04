@@ -5,7 +5,7 @@
 
 from service.vegetable_service import VegetableService
 from entity.vegetable import Vegetable
-from ui.styles import GLOBAL_STYLE, CARD_BG
+from ui.styles import GLOBAL_STYLE, CARD_BG, SECONDARY_BTN_STYLE, nav_btn_style
 from typing import Optional
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -66,27 +66,27 @@ class AdminWindow(QDialog):
         nav_layout.addWidget(nav_title)
 
         self.nav_veg = QPushButton("🥬 蔬菜信息管理")
-        self.nav_veg.setStyleSheet(self._nav_style(True))
+        self.nav_veg.setStyleSheet(nav_btn_style(True, "#FFF3E0", "#E65100"))
         self.nav_veg.clicked.connect(lambda: self._switch_page(0))
         nav_layout.addWidget(self.nav_veg)
 
         self.nav_recipe = QPushButton("📖 菜谱数据管理")
-        self.nav_recipe.setStyleSheet(self._nav_style(False))
+        self.nav_recipe.setStyleSheet(nav_btn_style(False, "#FFF3E0", "#E65100"))
         self.nav_recipe.clicked.connect(lambda: self._switch_page(1))
         nav_layout.addWidget(self.nav_recipe)
 
         self.nav_mining = QPushButton("⛏ 关联规则挖掘")
-        self.nav_mining.setStyleSheet(self._nav_style(False))
+        self.nav_mining.setStyleSheet(nav_btn_style(False, "#FFF3E0", "#E65100"))
         self.nav_mining.clicked.connect(lambda: self._switch_page(2))
         nav_layout.addWidget(self.nav_mining)
 
         self.nav_users = QPushButton("👥 用户管理")
-        self.nav_users.setStyleSheet(self._nav_style(False))
+        self.nav_users.setStyleSheet(nav_btn_style(False, "#FFF3E0", "#E65100"))
         self.nav_users.clicked.connect(lambda: self._switch_page(3))
         nav_layout.addWidget(self.nav_users)
 
         self.nav_reset = QPushButton("🔄 系统重置")
-        self.nav_reset.setStyleSheet(self._nav_style(False))
+        self.nav_reset.setStyleSheet(nav_btn_style(False, "#FFF3E0", "#E65100"))
         self.nav_reset.clicked.connect(lambda: self._switch_page(4))
         nav_layout.addWidget(self.nav_reset)
 
@@ -100,12 +100,7 @@ class AdminWindow(QDialog):
         bottom_layout.setContentsMargins(0, 0, 0, 0)
 
         close_btn = QPushButton("返回主窗口")
-        close_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 16px; "
-            "font-size: 13px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        close_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         close_btn.clicked.connect(self.accept)
         bottom_layout.addWidget(close_btn)
 
@@ -134,24 +129,13 @@ class AdminWindow(QDialog):
         main_layout.addWidget(self.content_stack)
         self.setLayout(main_layout)
 
-    def _nav_style(self, active: bool) -> str:
-        """导航按钮样式"""
-        bg = "#FFF3E0" if active else "transparent"
-        color = "#E65100" if active else "#333"
-        return (
-            f"text-align: left; padding: 12px 18px; border: none; "
-            f"border-radius: 0; background-color: {bg}; "
-            f"color: {color}; font-size: 14px;"
-            + ("font-weight: bold;" if active else "")
-        )
-
     def _switch_page(self, index: int):
         """切换页面"""
         self.content_stack.setCurrentIndex(index)
         btns = [self.nav_veg, self.nav_recipe, self.nav_mining,
                 self.nav_users, self.nav_reset]
         for i, btn in enumerate(btns):
-            btn.setStyleSheet(self._nav_style(i == index))
+            btn.setStyleSheet(nav_btn_style(i == index, "#FFF3E0", "#E65100"))
         if index == 2:
             self._refresh_mining_status()
         if index == 3:

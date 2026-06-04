@@ -82,8 +82,6 @@ class AssociationRuleDAO(BaseDAO):
         rows = self.fetch_all(sql)
         return [AssociationRule.from_row(r) for r in rows]
 
-    def count(self) -> int:
+    def count(self, table='veg_association_rule', where='', params=()):
         """统计关联规则总数"""
-        sql = "SELECT COUNT(*) as cnt FROM veg_association_rule"
-        row = self.fetch_one(sql)
-        return row['cnt'] if row else 0
+        return super().count(table, where, params)

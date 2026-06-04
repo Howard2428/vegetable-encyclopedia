@@ -57,14 +57,10 @@ class FavoritesDAO(BaseDAO):
 
     def add_item(self, fav_list_id: int, veg_id: int) -> int:
         """向收藏夹添加蔬菜"""
-        # 检查是否已存在
-        check_sql = """
-            SELECT COUNT(*) as cnt FROM veg_favorite_item
-            WHERE fav_list_id = ? AND veg_id = ?
-        """
-        row = self.fetch_one(check_sql, (fav_list_id, veg_id))
-        if row and row['cnt'] > 0:
-            return 0  # 已存在，不重复添加
+        if self.count('veg_favorite_item',
+                     'fav_list_id = ? AND veg_id = ?',
+                     (fav_list_id, veg_id)) > 0:
+            return 0
 
         sql = """
             INSERT INTO veg_favorite_item (fav_list_id, veg_id, create_time)
@@ -93,12 +89,9 @@ class FavoritesDAO(BaseDAO):
 
     def is_favorited(self, fav_list_id: int, veg_id: int) -> bool:
         """检查蔬菜是否已在收藏夹中"""
-        sql = """
-            SELECT COUNT(*) as cnt FROM veg_favorite_item
-            WHERE fav_list_id = ? AND veg_id = ?
-        """
-        row = self.fetch_one(sql, (fav_list_id, veg_id))
-        return row['cnt'] > 0 if row else False
+        return self.count('veg_favorite_item',
+                         'fav_list_id = ? AND veg_id = ?',
+                         (fav_list_id, veg_id)) > 0
 
     def get_favorited_veg_ids(self, user_id: int) -> List[int]:
         """获取用户所有收藏的蔬菜ID列表（用于UI状态同步）"""

@@ -4,7 +4,6 @@
 
 import sys
 import os
-import re
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from PySide6.QtWidgets import (
@@ -12,29 +11,10 @@ from PySide6.QtWidgets import (
     QPushButton, QMessageBox, QProgressBar
 )
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction, QIcon, QPixmap, QPainter, QColor, QPen, QBrush
-from ui.styles import GLOBAL_STYLE
-
-
-def _make_eye_icon(visible: bool) -> QIcon:
-    px = QPixmap(32, 32)
-    px.fill(Qt.transparent)
-    p = QPainter(px)
-    p.setRenderHint(QPainter.Antialiasing)
-    if visible:
-        p.setPen(QPen(QColor("#666"), 2))
-        p.setBrush(QBrush(Qt.white))
-        p.drawEllipse(6, 10, 20, 13)
-        p.setBrush(QBrush(QColor("#666")))
-        p.drawEllipse(14, 13, 6, 7)
-    else:
-        p.setPen(QPen(QColor("#666"), 2))
-        p.setBrush(Qt.NoBrush)
-        p.drawEllipse(6, 10, 20, 13)
-        p.setPen(QPen(QColor("#D32F2F"), 2.5))
-        p.drawLine(3, 3, 29, 29)
-    p.end()
-    return QIcon(px)
+from PySide6.QtGui import QAction
+from ui.styles import GLOBAL_STYLE, SECONDARY_BTN_STYLE
+from utils.ui_helpers import make_eye_icon, toggle_password_visibility
+from utils.password_utils import check_password_strength, is_weak_password
 
 
 class RegisterWindow(QDialog):
@@ -74,8 +54,8 @@ class RegisterWindow(QDialog):
         self.password_input.setPlaceholderText("至少8位，含大小写字母+数字")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.textChanged.connect(self._check_strength)
-        self._icon_visible = _make_eye_icon(True)
-        self._icon_hidden = _make_eye_icon(False)
+        self._icon_visible = make_eye_icon(True)
+        self._icon_hidden = make_eye_icon(False)
         self._pwd1_action = QAction(self._icon_visible, "", self.password_input)
         self._pwd1_action.triggered.connect(lambda: self._toggle_pwd(self.password_input, self._pwd1_action))
         self.password_input.addAction(self._pwd1_action, QLineEdit.TrailingPosition)
@@ -124,12 +104,7 @@ class RegisterWindow(QDialog):
         layout.addSpacing(10)
 
         self.cancel_btn = QPushButton("取 消")
-        self.cancel_btn.setStyleSheet(
-            "QPushButton { background-color: white; color: #2E7D32; "
-            "border: 2px solid #2E7D32; border-radius: 6px; padding: 8px 18px; "
-            "font-size: 14px; font-weight: bold; min-height: 30px; } "
-            "QPushButton:hover { background-color: #E8F5E9; }"
-        )
+        self.cancel_btn.setStyleSheet(SECONDARY_BTN_STYLE)
         self.cancel_btn.clicked.connect(self.reject)
         layout.addWidget(self.cancel_btn)
 
@@ -137,12 +112,10 @@ class RegisterWindow(QDialog):
 
     def _toggle_pwd(self, input_field, action):
         """切换密码显示/隐藏"""
-        if input_field.echoMode() == QLineEdit.Password:
-            input_field.setEchoMode(QLineEdit.Normal)
-            action.setIcon(self._icon_hidden)
-        else:
-            input_field.setEchoMode(QLineEdit.Password)
-            action.setIcon(self._icon_visible)
+        toggle_password_visibility(
+            input_field, action,
+            self._icon_visible, self._icon_hidden
+        )
 
     def _check_strength(self, text: str):
         """检测密码强度"""
@@ -186,21 +159,13 @@ class RegisterWindow(QDialog):
             QMessageBox.warning(self, "提示", "密码至少需要8个字符")
             return
 
-        score = 0
-        if re.search(r'[a-z]', password) and re.search(r'[A-Z]', password):
-            score += 1
-        if re.search(r'\d', password):
-            score += 1
-        if re.search(r'[!@#$%^&*(),.?\":{}|<>_\-]', password):
-            score += 1
-
-        if score < 2:
+        if is_weak_password(password):
             QMessageBox.warning(
-        self, "密码强度不足",
-        "密码需包含以下至少2项：\n"
-        "  • 大写字母 + 小写字母\n"
-        "  • 数字\n"
-        "  • 特殊符号（!@#$%等）"
+                self, "密码强度不足",
+                "密码需包含以下至少2项：\n"
+                "  • 大写字母 + 小写字母\n"
+                "  • 数字\n"
+                "  • 特殊符号（!@#$%等）"
             )
             return
 

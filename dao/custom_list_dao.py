@@ -54,12 +54,9 @@ class CustomListDAO(BaseDAO):
         Returns:
             True表示已存在（重复）
         """
-        sql = """
-            SELECT COUNT(*) as cnt FROM veg_custom_list
-            WHERE user_id = ? AND list_name = ?
-        """
-        row = self.fetch_one(sql, (user_id, list_name))
-        return row['cnt'] > 0 if row else False
+        return self.count('veg_custom_list',
+                         'user_id = ? AND list_name = ?',
+                         (user_id, list_name)) > 0
 
     def delete_list(self, list_id: int) -> int:
         """删除自定义清单（同时删除其中的明细项）"""
@@ -74,14 +71,10 @@ class CustomListDAO(BaseDAO):
 
     def add_item(self, list_id: int, veg_id: int) -> int:
         """向清单添加蔬菜"""
-        # 检查是否已存在
-        check_sql = """
-            SELECT COUNT(*) as cnt FROM veg_list_item
-            WHERE list_id = ? AND veg_id = ?
-        """
-        row = self.fetch_one(check_sql, (list_id, veg_id))
-        if row and row['cnt'] > 0:
-            return 0  # 已存在
+        if self.count('veg_list_item',
+                     'list_id = ? AND veg_id = ?',
+                     (list_id, veg_id)) > 0:
+            return 0
 
         sql = """
             INSERT INTO veg_list_item (list_id, veg_id, create_time)
@@ -118,15 +111,10 @@ class CustomListDAO(BaseDAO):
         Returns:
             蔬菜数量
         """
-        sql = "SELECT COUNT(*) as cnt FROM veg_list_item WHERE list_id = ?"
-        row = self.fetch_one(sql, (list_id,))
-        return row['cnt'] if row else 0
+        return self.count('veg_list_item', 'list_id = ?', (list_id,))
 
     def is_in_list(self, list_id: int, veg_id: int) -> bool:
         """检查蔬菜是否已在清单中"""
-        sql = """
-            SELECT COUNT(*) as cnt FROM veg_list_item
-            WHERE list_id = ? AND veg_id = ?
-        """
-        row = self.fetch_one(sql, (list_id, veg_id))
-        return row['cnt'] > 0 if row else False
+        return self.count('veg_list_item',
+                         'list_id = ? AND veg_id = ?',
+                         (list_id, veg_id)) > 0
